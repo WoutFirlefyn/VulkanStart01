@@ -11,10 +11,33 @@ void CommandPool::Initialize(const VkDevice& device, const QueueFamilyIndices& q
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+	poolInfo.queueFamilyIndex = queue.graphicsFamily.value();
 
 	if (vkCreateCommandPool(device, &poolInfo, nullptr, &m_CommandPool) != VK_SUCCESS)
 		throw std::runtime_error("failed to create command pool!");
+}
+
+void CommandPool::Destroy()
+{
+	vkDestroyCommandPool(m_VkDevice, m_CommandPool, nullptr);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 CommandBuffer CommandPool::CreateCommandBuffer() const 
@@ -31,6 +54,6 @@ CommandBuffer CommandPool::CreateCommandBuffer() const
 		throw std::runtime_error("failed to allocate command buffers!");
 
 	CommandBuffer cmdBuffer;
-	cmdBuffer.setVkCommandBuffer(commandBuffer);
+	cmdBuffer.SetVkCommandBuffer(commandBuffer);
 	return cmdBuffer;
 }

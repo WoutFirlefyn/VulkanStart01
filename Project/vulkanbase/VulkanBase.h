@@ -6,8 +6,6 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #include "VulkanUtil.h"
-#include "GP2Shader.h"
-#include "CommandPool.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -19,6 +17,10 @@
 #include <set>
 #include <limits>
 #include <algorithm>
+
+#include "GP2Shader.h"
+#include "CommandPool.h"
+#include "CommandBuffer.h"
 
 
 const std::vector<const char*> validationLayers = {
@@ -74,9 +76,10 @@ private:
 		createGraphicsPipeline();
 		createFrameBuffers();
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
+		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		// week 02
-		createCommandPool();
-		createCommandBuffer();
+		//createCommandPool();
+		//createCommandBuffer();
 
 		// week 06
 		createSyncObjects();
@@ -96,10 +99,9 @@ private:
 		vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
 		vkDestroyFence(device, inFlightFence, nullptr);
 
-		vkDestroyCommandPool(device, commandPool, nullptr);
-		for (auto framebuffer : swapChainFramebuffers) {
+		m_CommandPool.Destroy();
+		for (auto framebuffer : swapChainFramebuffers)
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
 
 		vkDestroyPipeline(device, graphicsPipeline, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -155,16 +157,14 @@ private:
 	// CommandBuffer concept
 
 	CommandPool m_CommandPool;
-
-	VkCommandPool commandPool;
-	VkCommandBuffer commandBuffer;
+	CommandBuffer m_CommandBuffer;
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
-	void drawFrame(uint32_t imageIndex);
-	void createCommandBuffer();
-	void createCommandPool(); 
-	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+	void drawFrame(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+	//void createCommandBuffer();
+	//void createCommandPool(); 
+	//void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	
 	// Week 03
 	// Renderpass concept

@@ -36,15 +36,18 @@ void VulkanBase::createSyncObjects() {
 
 }
 
-void VulkanBase::drawFrame() {
+void VulkanBase::drawFrame() 
+{
 	vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
 	vkResetFences(device, 1, &inFlightFence);
 
 	uint32_t imageIndex;
 	vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
-	vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
-	recordCommandBuffer(commandBuffer, imageIndex);
+	//vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
+	m_CommandBuffer.Reset();
+	m_CommandBuffer.BeginRecording();
+	drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -55,8 +58,7 @@ void VulkanBase::drawFrame() {
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
+	m_CommandBuffer.Submit(submitInfo);
 
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
 	submitInfo.signalSemaphoreCount = 1;

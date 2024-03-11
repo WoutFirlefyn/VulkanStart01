@@ -1,6 +1,7 @@
 #include "vulkanbase/VulkanBase.h"
 
-void VulkanBase::initWindow() {
+void VulkanBase::initWindow() 
+{
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -9,6 +10,7 @@ void VulkanBase::initWindow() {
 
 
 
-void VulkanBase::drawScene() {
-	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+void VulkanBase::drawScene() 
+{
+	//vkCmdDraw(m_CommandBuffer.GetVkCommandBuffer(), 6, 1, 0, 0);
 }
