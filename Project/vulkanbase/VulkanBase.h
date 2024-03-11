@@ -7,6 +7,7 @@
 #include <GLFW/glfw3native.h>
 #include "VulkanUtil.h"
 #include "GP2Shader.h"
+#include "CommandPool.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -72,6 +73,7 @@ private:
 		createRenderPass();
 		createGraphicsPipeline();
 		createFrameBuffers();
+		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
 		// week 02
 		createCommandPool();
 		createCommandBuffer();
@@ -151,6 +153,8 @@ private:
 	// Week 02
 	// Queue families
 	// CommandBuffer concept
+
+	CommandPool m_CommandPool;
 
 	VkCommandPool commandPool;
 	VkCommandBuffer commandBuffer;
