@@ -25,7 +25,7 @@ public:
 	//-------------------------------------------------
 	// Member functions						
 	//-------------------------------------------------
-	void SetVkCommandBuffer(VkCommandBuffer buffer) { m_CommandBuffer = buffer; }
+	void SetVkCommandBuffer(const VkCommandBuffer& buffer) { m_CommandBuffer = buffer; }
 	VkCommandBuffer GetVkCommandBuffer() const { return m_CommandBuffer; }
 	void Reset() const;
 	void BeginRecording() const;

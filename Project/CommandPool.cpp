@@ -20,24 +20,6 @@ void CommandPool::Initialize(const VkDevice& device, const QueueFamilyIndices& q
 void CommandPool::Destroy()
 {
 	vkDestroyCommandPool(m_VkDevice, m_CommandPool, nullptr);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 CommandBuffer CommandPool::CreateCommandBuffer() const 

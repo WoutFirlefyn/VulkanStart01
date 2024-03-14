@@ -21,6 +21,9 @@
 #include "GP2Shader.h"
 #include "CommandPool.h"
 #include "CommandBuffer.h"
+#include "Vertex.h"
+#include "Mesh.h"
+#include "Scene.h"
 
 
 const std::vector<const char*> validationLayers = {
@@ -75,11 +78,20 @@ private:
 		createRenderPass();
 		createGraphicsPipeline();
 		createFrameBuffers();
-		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
-		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
+
 		// week 02
-		//createCommandPool();
-		//createCommandBuffer();
+		m_Mesh.AddVertex(glm::vec2{ -0.25, -0.25 }, glm::vec3{ 1.0, 0.0, 0.0 });
+		m_Mesh.AddVertex(glm::vec2{ 0.25, -0.25 }, glm::vec3{ 0.0, 1.0, 0.0 });
+		m_Mesh.AddVertex(glm::vec2{ -0.25, 0.25 }, glm::vec3{ 0.0, 0.0, 1.0 });
+		m_Mesh.AddVertex(glm::vec2{ -0.25, 0.25 }, glm::vec3{ 0.0, 0.0, 1.0 });
+		m_Mesh.AddVertex(glm::vec2{ 0.25, -0.25 }, glm::vec3{ 0.0, 1.0, 0.0 });
+		m_Mesh.AddVertex(glm::vec2{ 0.25, 0.25 }, glm::vec3{ 1.0, 0.0, 0.0 });
+
+		//m_Scene.AddRoundedRectangle(-0.95f, -0.25f, 0.15f, 0.25f, 0.1f, 0.3f, 10, physicalDevice, device);
+
+		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
+		m_Mesh.Initialize(physicalDevice,device);
+		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 
 		// week 06
 		createSyncObjects();
@@ -107,14 +119,17 @@ private:
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyRenderPass(device, renderPass, nullptr);
 
-		for (auto imageView : swapChainImageViews) {
+		for (auto imageView : swapChainImageViews)
 			vkDestroyImageView(device, imageView, nullptr);
-		}
 
-		if (enableValidationLayers) {
+		if (enableValidationLayers) 
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-		}
+
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
+
+		m_Mesh.DestroyMesh(device);
+		m_Scene.Destroy(device);
+
 		vkDestroyDevice(device, nullptr);
 
 		vkDestroySurfaceKHR(instance, surface, nullptr);
@@ -144,12 +159,6 @@ private:
 	GLFWwindow* window;
 	void initWindow();
 
-	VkPipelineShaderStageCreateInfo createFragmentShaderInfo();
-	VkPipelineShaderStageCreateInfo createVertexShaderInfo();
-	VkPipelineVertexInputStateCreateInfo createVertexInputStateInfo();
-	VkPipelineInputAssemblyStateCreateInfo createInputAssemblyStateInfo();
-	VkShaderModule createShaderModule(const std::vector<char>& code);
-
 	void drawScene();
 
 	// Week 02
@@ -158,13 +167,12 @@ private:
 
 	CommandPool m_CommandPool;
 	CommandBuffer m_CommandBuffer;
+	Mesh m_Mesh{};
+	Scene m_Scene{};
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
 	void drawFrame(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-	//void createCommandBuffer();
-	//void createCommandPool(); 
-	//void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	
 	// Week 03
 	// Renderpass concept
@@ -174,6 +182,7 @@ private:
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
 	VkRenderPass renderPass;
+
 
 	void createFrameBuffers();
 	void createRenderPass();

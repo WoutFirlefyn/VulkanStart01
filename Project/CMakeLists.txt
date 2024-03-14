@@ -42,7 +42,10 @@ set(SOURCES
     "CommandPool.cpp"
     "CommandBuffer.h"
     "CommandBuffer.cpp"
-)
+    "Vertex.h" 
+    "Mesh.h" 
+    "Mesh.cpp"
+ "Scene.cpp" "Scene.h")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )

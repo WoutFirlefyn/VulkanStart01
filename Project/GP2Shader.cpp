@@ -1,10 +1,11 @@
 #include "GP2Shader.h"
 #include "vulkanbase/VulkanUtil.h"
+#include "Vertex.h"
 
 void GP2Shader::initialize(const VkDevice& vkDevice)
 {
-	m_ShaderStages.push_back(createVertexShaderInfo(vkDevice));
 	m_ShaderStages.push_back(createFragmentShaderInfo(vkDevice));
+	m_ShaderStages.push_back(createVertexShaderInfo(vkDevice));
 }
 
 void GP2Shader::destroyShaderModules(const VkDevice& vkDevice)
@@ -14,7 +15,8 @@ void GP2Shader::destroyShaderModules(const VkDevice& vkDevice)
 	m_ShaderStages.clear();
 }
 
-VkPipelineShaderStageCreateInfo GP2Shader::createFragmentShaderInfo(const VkDevice& vkDevice) {
+VkPipelineShaderStageCreateInfo GP2Shader::createFragmentShaderInfo(const VkDevice& vkDevice) 
+{
 	std::vector<char> fragShaderCode = readFile(m_FragmentShaderFile);
 	VkShaderModule fragShaderModule = createShaderModule(vkDevice, fragShaderCode);
 
@@ -27,7 +29,8 @@ VkPipelineShaderStageCreateInfo GP2Shader::createFragmentShaderInfo(const VkDevi
 	return fragShaderStageInfo;
 }
 
-VkPipelineShaderStageCreateInfo GP2Shader::createVertexShaderInfo(const VkDevice& vkDevice) {
+VkPipelineShaderStageCreateInfo GP2Shader::createVertexShaderInfo(const VkDevice& vkDevice) 
+{
 	std::vector<char> vertShaderCode = readFile(m_VertexShaderFile);
 	VkShaderModule vertShaderModule = createShaderModule(vkDevice, vertShaderCode);
 
@@ -42,9 +45,15 @@ VkPipelineShaderStageCreateInfo GP2Shader::createVertexShaderInfo(const VkDevice
 VkPipelineVertexInputStateCreateInfo GP2Shader::createVertexInputStateInfo()
 {
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+
+	//auto bindingDescription = Vertex::GetBindingDescription();
+	//auto attributeDescriptions = Vertex::GetAttributeDescriptions();
+
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(m_AttributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &m_InputBinding;
+	vertexInputInfo.pVertexAttributeDescriptions = m_AttributeDescriptions.data();
 	return vertexInputInfo;
 }
 
@@ -57,7 +66,8 @@ VkPipelineInputAssemblyStateCreateInfo GP2Shader::createInputAssemblyStateInfo()
 	return inputAssembly;
 }
 
-VkShaderModule GP2Shader::createShaderModule(const VkDevice& vkDevice, const std::vector<char>& code) {
+VkShaderModule GP2Shader::createShaderModule(const VkDevice& vkDevice, const std::vector<char>& code) 
+{
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.codeSize = code.size();
