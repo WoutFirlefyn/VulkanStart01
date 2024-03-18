@@ -8,6 +8,7 @@
 //-----------------------------------------------------
 // CommandBuffer Class									
 //-----------------------------------------------------
+class CommandPool;
 class CommandBuffer final
 {
 public:
@@ -30,6 +31,8 @@ public:
 	void Reset() const;
 	void BeginRecording() const;
 	void EndRecording() const;
+
+	void FreeBuffer(const VkDevice& device, const CommandPool& commandPool);
 
 	void Submit(VkSubmitInfo& info) const;
 

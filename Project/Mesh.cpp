@@ -1,47 +1,33 @@
 #include "Mesh.h"
+#include "CommandBuffer.h"
 
 
-void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& device)
+void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool,VkQueue graphicsQueue)
 {
-	VkBufferCreateInfo bufferInfo{};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = sizeof(m_vVertices[0]) * m_vVertices.size();
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VkDeviceSize size = sizeof(m_vVertices[0]) * m_vVertices.size();
 
-	if (vkCreateBuffer(device, &bufferInfo, nullptr, &m_VkBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create vertex buffer!");
-	}
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(device, m_VkBuffer, &memRequirements);
-
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = FindMemoryType(physicalDevice, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &m_VkBufferMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate vertex buffer memory!");
-	}
-
-	vkBindBufferMemory(device, m_VkBuffer, m_VkBufferMemory, 0);
+	m_StagingBuffer.CreateBuffer(device, physicalDevice, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data;
-	vkMapMemory(device, m_VkBufferMemory, 0, bufferInfo.size, 0, &data);
-	memcpy(data, m_vVertices.data(), (size_t)bufferInfo.size);
-	vkUnmapMemory(device, m_VkBufferMemory);
+	vkMapMemory(device, m_StagingBuffer.GetVkBufferMemory(), 0, size, 0, &data);
+	memcpy(data, m_vVertices.data(), (size_t)size);
+	vkUnmapMemory(device, m_StagingBuffer.GetVkBufferMemory());
+
+	m_VertexBuffer.CreateBuffer(device, physicalDevice, size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+	CopyBuffer(device, commandPool, size, graphicsQueue);
 }
 
 void Mesh::DestroyMesh(const VkDevice& device)
 {
-	vkDestroyBuffer(device, m_VkBuffer, nullptr);
-	vkFreeMemory(device, m_VkBufferMemory, nullptr);
+	m_VertexBuffer.DestroyBuffer(device);
+	m_StagingBuffer.DestroyBuffer(device);
 }
 
 void Mesh::Draw(const VkCommandBuffer& cmdBuffer) const
 {
-	VkBuffer vertexBuffers[] = { m_VkBuffer, };
-	VkDeviceSize offsets[] = { 0, };
+	VkBuffer vertexBuffers[] = { m_VertexBuffer.GetVkBuffer() };
+	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdBuffer, 0, 1, vertexBuffers, offsets);
 	vkCmdDraw(cmdBuffer, static_cast<uint32_t>(m_vVertices.size()), 1, 0, 0);
 }
@@ -54,12 +40,6 @@ void Mesh::AddVertex(const glm::vec2& pos, const glm::vec3& color)
 void Mesh::AddVertex(const Vertex& vertex)
 {
 	AddVertex(vertex.pos, vertex.color);
-}
-
-void Mesh::CombineMeshes(const Mesh& other)
-{
-	for (const Vertex& vertex : other.GetVertices())
-		AddVertex(vertex);
 }
 
 uint32_t Mesh::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const
@@ -75,3 +55,40 @@ uint32_t Mesh::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t t
 
 	throw std::runtime_error("failed to find suitable memory type!");
 }
+
+void Mesh::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device)
+{
+	VkDeviceSize bufferSize = sizeof(m_vVertices[0]) * m_vVertices.size();
+	m_StagingBuffer.CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	void* data;	
+	vkMapMemory(device, m_StagingBuffer.GetVkBufferMemory(), 0, bufferSize, 0, &data);
+	memcpy(data, m_vVertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, m_StagingBuffer.GetVkBufferMemory());
+}
+
+ void Mesh::CopyBuffer(const VkDevice& device, const CommandPool& commandPool, VkDeviceSize size, VkQueue graphicsQueue)
+ {
+	 CommandBuffer commandBuffer = commandPool.CreateCommandBuffer();
+
+	 VkCommandBufferBeginInfo beginInfo{};
+	 beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	 beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	 vkBeginCommandBuffer(commandBuffer.GetVkCommandBuffer(), &beginInfo);
+
+	 VkBufferCopy copyRegion{};
+	 copyRegion.size = size;
+	 vkCmdCopyBuffer(commandBuffer.GetVkCommandBuffer(), m_StagingBuffer.GetVkBuffer(), m_VertexBuffer.GetVkBuffer(), 1, &copyRegion);
+
+	 vkEndCommandBuffer(commandBuffer.GetVkCommandBuffer());
+
+	 VkSubmitInfo submitInfo{};
+	 submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	 commandBuffer.Submit(submitInfo);
+
+	 vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	 vkQueueWaitIdle(graphicsQueue);
+
+	 commandBuffer.FreeBuffer(device, commandPool);
+ }

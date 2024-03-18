@@ -80,17 +80,8 @@ private:
 		createFrameBuffers();
 
 		// week 02
-		m_Mesh.AddVertex(glm::vec2{ -0.25, -0.25 }, glm::vec3{ 1.0, 0.0, 0.0 });
-		m_Mesh.AddVertex(glm::vec2{ 0.25, -0.25 }, glm::vec3{ 0.0, 1.0, 0.0 });
-		m_Mesh.AddVertex(glm::vec2{ -0.25, 0.25 }, glm::vec3{ 0.0, 0.0, 1.0 });
-		m_Mesh.AddVertex(glm::vec2{ -0.25, 0.25 }, glm::vec3{ 0.0, 0.0, 1.0 });
-		m_Mesh.AddVertex(glm::vec2{ 0.25, -0.25 }, glm::vec3{ 0.0, 1.0, 0.0 });
-		m_Mesh.AddVertex(glm::vec2{ 0.25, 0.25 }, glm::vec3{ 1.0, 0.0, 0.0 });
-
-		//m_Scene.AddRoundedRectangle(-0.95f, -0.25f, 0.15f, 0.25f, 0.1f, 0.3f, 10, physicalDevice, device);
-
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
-		m_Mesh.Initialize(physicalDevice,device);
+		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 
 		// week 06

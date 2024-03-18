@@ -31,7 +31,7 @@ void VulkanBase::drawFrame(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
 	scissor.extent = swapChainExtent;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	m_Mesh.Draw(commandBuffer);
+	m_Scene.Draw(commandBuffer);
 	vkCmdEndRenderPass(commandBuffer);
 }
 

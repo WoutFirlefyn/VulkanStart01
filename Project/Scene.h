@@ -1,6 +1,7 @@
 #pragma once
 #include "vulkanbase/VulkanUtil.h"
 #include <vector>
+class CommandPool;
 class Mesh;
 class Scene
 {
@@ -14,13 +15,9 @@ public:
 	Scene& operator=(Scene&& other) noexcept = delete;
 
 	void AddMesh(const Mesh& mesh);
-	void AddRectangle(float bottom, float left, float top, float right, const VkPhysicalDevice& physicalDevice, const VkDevice& device);
-	void AddRoundedRectangle(float bottom, float left, float top, float right, float radiusX, float radiusY, int numberOfSegmentsPerCorner, const VkPhysicalDevice& physicalDevice, const VkDevice& device);
-	void AddOval(float centerX, float centerY, float radiusX, float radiusY, int numberOfSegments, const VkPhysicalDevice& physicalDevice, const VkDevice& device);
+	void AddRectangle(float bottom, float left, float top, float right, const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue);
 	void Draw(const VkCommandBuffer& cmdBuffer) const;
 	void Destroy(const VkDevice& device);
 private:
-	Mesh CreateRectangle(float bottom, float left, float top, float right);
-
 	std::vector<Mesh> m_vMeshes;
 };

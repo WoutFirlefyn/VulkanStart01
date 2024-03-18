@@ -42,7 +42,7 @@ void VulkanBase::drawFrame()
 	vkResetFences(device, 1, &inFlightFence);
 
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
 	m_CommandBuffer.Reset();
 	m_CommandBuffer.BeginRecording();

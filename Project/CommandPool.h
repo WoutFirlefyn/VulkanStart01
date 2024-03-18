@@ -36,6 +36,8 @@ public:													// Constructor
 
 	CommandBuffer CreateCommandBuffer()const;
 
+	const VkCommandPool& GetCommandPool() const { return m_CommandPool; }
+
 private: 
 	//-------------------------------------------------
 	// Private member functions								

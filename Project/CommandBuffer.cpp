@@ -2,16 +2,15 @@
 // Includes
 //---------------------------
 #include "CommandBuffer.h"
+#include "CommandPool.h"
 
 //---------------------------
 // Member functions
 //---------------------------
 
-// write member functions here
-
 void CommandBuffer::Reset() const
 {
-	vkResetCommandBuffer(m_CommandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
+	vkResetCommandBuffer(m_CommandBuffer, 0);
 }
 
 void CommandBuffer::BeginRecording() const
@@ -29,6 +28,11 @@ void CommandBuffer::EndRecording() const
 {
 	if (vkEndCommandBuffer(m_CommandBuffer) != VK_SUCCESS)
 		throw std::runtime_error("failed to record command buffer!");
+}
+
+void CommandBuffer::FreeBuffer(const VkDevice& device, const CommandPool& commandPool)
+{
+	vkFreeCommandBuffers(device, commandPool.GetCommandPool(), 1, &m_CommandBuffer);
 }
 
 void CommandBuffer::Submit(VkSubmitInfo& info) const
