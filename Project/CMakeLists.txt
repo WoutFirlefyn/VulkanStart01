@@ -49,7 +49,7 @@ set(SOURCES
     "Scene.cpp" 
     "Buffer.h"
     "Buffer.cpp"
-)
+ "DescriptorPool.h" "DescriptorPool.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )

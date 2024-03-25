@@ -29,6 +29,8 @@ public:
 		VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
 	uint32_t FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const;
 
+	void BindAsVertexBuffer(VkCommandBuffer commandBuffer) const;
+	void BindAsIndexBuffer(VkCommandBuffer commandBuffer) const;
 	const VkBuffer& GetVkBuffer() const { return m_Buffer; }
 	const VkDeviceMemory& GetVkBufferMemory() const { return m_BufferMemory; }
 

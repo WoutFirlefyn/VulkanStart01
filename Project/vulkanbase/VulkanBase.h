@@ -74,8 +74,9 @@ private:
 		createImageViews();
 		
 		// week 03
-		m_GradientShader.initialize(device);
+		m_GradientShader.initialize(physicalDevice, device);
 		createRenderPass();
+		m_GradientShader.createDescriptorSetLayout(device);
 		createGraphicsPipeline();
 		createFrameBuffers();
 
@@ -176,7 +177,7 @@ private:
 
 
 	void createFrameBuffers();
-	void createRenderPass();
+	void createRenderPass(); 
 	void createGraphicsPipeline();
 
 	// Week 04

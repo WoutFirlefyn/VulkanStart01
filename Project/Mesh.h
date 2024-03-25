@@ -26,13 +26,17 @@ public:
 	void AddVertex(const glm::vec2& pos, const glm::vec3& color);
 	void AddVertex(const Vertex& vertex);
 
+	void SetIndices(const std::vector<uint16_t>& vIndices);
+
 	std::vector<Vertex> GetVertices() const { return m_vVertices; }
-	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, VkDeviceSize size, VkQueue graphicsQueue);
+	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, Buffer stagingBuffer, Buffer dstBuffer, VkDeviceSize size, VkQueue graphicsQueue);
 private:
 	uint32_t FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const;
-	void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device);
+	void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
+	void CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
 
-	Buffer m_StagingBuffer{};
 	Buffer m_VertexBuffer{};
+	Buffer m_IndexBuffer{};
 	std::vector<Vertex> m_vVertices{};
+	std::vector<uint16_t> m_vIndices{};
 };
