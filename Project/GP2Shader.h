@@ -4,32 +4,26 @@
 #include <vector>
 #include "Vertex.h"
 #include "Buffer.h"
+class DescriptorPool;
 struct Vertex;
 class GP2Shader final
 {
 public:
-	GP2Shader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile) 
-		: m_VertexShaderFile{ vertexShaderFile }
-		, m_FragmentShaderFile{ fragmentShaderFile }
-		, m_ShaderStages{}
-		, m_InputBinding{ Vertex::GetBindingDescription() }
-		, m_AttributeDescriptions{ Vertex::GetAttributeDescriptions() }
-	{
+	GP2Shader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile);
 
-	}
-
-	~GP2Shader() = default;
-	std::vector<VkPipelineShaderStageCreateInfo>& getShaderStages() { return m_ShaderStages; }
+	~GP2Shader();
 
 	void initialize(const VkPhysicalDevice& vkPhysicalDevice, const VkDevice& vkDevice);
+	void destroy(const VkDevice& vkDevice);
 	void destroyShaderModules(const VkDevice& vkDevice);
 	VkPipelineVertexInputStateCreateInfo createVertexInputStateInfo();
 	VkPipelineInputAssemblyStateCreateInfo createInputAssemblyStateInfo();
+	std::vector<VkPipelineShaderStageCreateInfo>& getShaderStages() { return m_ShaderStages; }
 
 	// UBO binding
 	void createDescriptorSetLayout(const VkDevice& vkDevice);
-	void bindDescriptorSet(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);
-	const VkDescriptorSetLayout& getDescriptorSetLayout() const{ return m_DescriptorSetLayout; } 
+	const VkDescriptorSetLayout& getDescriptorSetLayout() const{ return m_DescriptorSetLayout; }
+	void bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);
 private:
 	VkPipelineShaderStageCreateInfo createFragmentShaderInfo(const VkDevice& vkDevice);
 	VkPipelineShaderStageCreateInfo createVertexShaderInfo(const VkDevice& vkDevice);
@@ -46,7 +40,7 @@ private:
 	VkDescriptorSetLayout m_DescriptorSetLayout;
 	std::unique_ptr<Buffer> m_UBOBuffer;
 	VertexUBO m_UBOSrc;
-	//std::unique_ptr<DescriptorPool> m_DescriptorPool;
+	std::unique_ptr<DescriptorPool> m_DescriptorPool;
 
 	GP2Shader(const GP2Shader&) = delete;
 	GP2Shader& operator= (const GP2Shader&) = delete;

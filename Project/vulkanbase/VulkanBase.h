@@ -84,6 +84,7 @@ private:
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
 		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
+		m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
 
 		// week 06
 		createSyncObjects();
@@ -103,6 +104,7 @@ private:
 		vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
 		vkDestroyFence(device, inFlightFence, nullptr);
 
+		m_GradientShader.destroy(device);
 		m_CommandPool.Destroy();
 		for (auto framebuffer : swapChainFramebuffers)
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
@@ -119,7 +121,6 @@ private:
 
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-		m_Mesh.DestroyMesh(device);
 		m_Scene.Destroy(device);
 
 		vkDestroyDevice(device, nullptr);
@@ -159,7 +160,7 @@ private:
 
 	CommandPool m_CommandPool;
 	CommandBuffer m_CommandBuffer;
-	Mesh m_Mesh{};
+	//Mesh m_Mesh{};
 	Scene m_Scene{};
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);

@@ -16,7 +16,7 @@ void VulkanBase::drawFrame(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
+	
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;

@@ -3,15 +3,15 @@
 #include <vector>
 #include <memory>
 #include "Buffer.h"
-class DAEDescriptorPool
+class DescriptorPool
 {
 public:
-	DAEDescriptorPool(VkDevice device, VkDeviceSize size, size_t count);
-	~DAEDescriptorPool();
-	void createDescriptorSets(VkDescriptorSetLayout descriptorSetLayout,
+	DescriptorPool(VkDevice device, VkDeviceSize size, size_t count);
+	~DescriptorPool();
+	void Initialize();
+	void CreateDescriptorSets(VkDescriptorSetLayout descriptorSetLayout,
 		std::initializer_list<VkBuffer> buffers);
-	void bindDescriptorSet(VkCommandBuffer buffer, VkPipelineLayout
-		layout, size_t index);
+	void BindDescriptorSet(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);
 private:
 	VkDevice m_Device;
 	VkDeviceSize m_Size;

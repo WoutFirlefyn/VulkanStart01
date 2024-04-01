@@ -3,10 +3,10 @@
 #include "Vertex.h"
 #include "CommandPool.h"
 
-void Scene::AddMesh(const Mesh& Mesh)
-{
-	m_vMeshes.push_back(Mesh);
-}
+//void Scene::AddMesh(const Mesh& mesh)
+//{
+//	m_vMeshes.push_back(std::move(mesh));
+//}
 
 void Scene::AddRectangle(float bottom, float left, float top, float right, const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {

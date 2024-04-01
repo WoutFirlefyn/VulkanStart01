@@ -10,14 +10,14 @@ void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& de
 
 void Mesh::DestroyMesh(const VkDevice& device)
 {
-	m_VertexBuffer.DestroyBuffer(device);
-	m_IndexBuffer.DestroyBuffer(device);
+	m_VertexBuffer.reset();
+	m_IndexBuffer.reset();
 }
 
 void Mesh::Draw(const VkCommandBuffer& cmdBuffer) const
 {
-	m_VertexBuffer.BindAsVertexBuffer(cmdBuffer);
-	m_IndexBuffer.BindAsIndexBuffer(cmdBuffer);
+	m_VertexBuffer->BindAsVertexBuffer(cmdBuffer);
+	m_IndexBuffer->BindAsIndexBuffer(cmdBuffer);
 	vkCmdDrawIndexed(cmdBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
 }
 
@@ -31,64 +31,62 @@ void Mesh::AddVertex(const Vertex& vertex)
 	m_vVertices.push_back(vertex);
 }
 
+void Mesh::AddTriangle(uint16_t i1, uint16_t i2, uint16_t i3, uint16_t offset)
+{
+}
+
 void Mesh::SetIndices(const std::vector<uint16_t>& vIndices)
 {
 	m_vIndices = vIndices;
 }
 
-uint32_t Mesh::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const
-{
-	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
-
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) 
-	{
-		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
-			return i;
-	}
-
-	throw std::runtime_error("failed to find suitable memory type!");
-}
+//uint32_t Mesh::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const
+//{
+//	VkPhysicalDeviceMemoryProperties memProperties;
+//	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+//
+//	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) 
+//	{
+//		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+//			return i;
+//	}
+//
+//	throw std::runtime_error("failed to find suitable memory type!");
+//}
 
 void Mesh::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
 	VkDeviceSize bufferSize = sizeof(Vertex) * m_vVertices.size();
 
-	Buffer stagingBuffer{};
-	stagingBuffer.CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Buffer stagingBuffer{  physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
 
 	void* data;
 	vkMapMemory(device, stagingBuffer.GetVkBufferMemory(), 0, bufferSize, 0, &data);
 	memcpy(data, m_vVertices.data(), (size_t)bufferSize);
 	vkUnmapMemory(device, stagingBuffer.GetVkBufferMemory());
 
-	m_VertexBuffer.CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	m_VertexBuffer = std::make_unique<Buffer>(physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 
-	CopyBuffer(device, commandPool, stagingBuffer, m_VertexBuffer, bufferSize, graphicsQueue);
-
-	stagingBuffer.DestroyBuffer(device);
+	CopyBuffer(device, commandPool, stagingBuffer, *m_VertexBuffer, bufferSize, graphicsQueue);
 }
 
 void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
 	VkDeviceSize bufferSize = sizeof(uint16_t) * m_vIndices.size();
 
-	Buffer stagingBuffer{};
-	stagingBuffer.CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
 
 	void* data;
 	vkMapMemory(device, stagingBuffer.GetVkBufferMemory(), 0, bufferSize, 0, &data);
 	memcpy(data, m_vIndices.data(), (size_t)bufferSize);
 	vkUnmapMemory(device, stagingBuffer.GetVkBufferMemory());
 
-	m_IndexBuffer.CreateBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	m_IndexBuffer= std::make_unique<Buffer>(physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
 
-	CopyBuffer(device, commandPool, stagingBuffer, m_IndexBuffer, bufferSize, graphicsQueue);
-
-	stagingBuffer.DestroyBuffer(device);
+	CopyBuffer(device, commandPool, stagingBuffer, *m_IndexBuffer, bufferSize, graphicsQueue);
 }
 
- void Mesh::CopyBuffer(const VkDevice& device, const CommandPool& commandPool, Buffer srcBuffer, Buffer dstBuffer, VkDeviceSize size, VkQueue graphicsQueue)
+ void Mesh::CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& srcBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue)
  {
 	 CommandBuffer commandBuffer = commandPool.CreateCommandBuffer();
 

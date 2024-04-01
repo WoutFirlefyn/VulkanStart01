@@ -14,7 +14,7 @@ public:
 	Scene& operator=(const Scene& other) = delete;
 	Scene& operator=(Scene&& other) noexcept = delete;
 
-	void AddMesh(const Mesh& mesh);
+	//void AddMesh(const Mesh& mesh);
 	void AddRectangle(float bottom, float left, float top, float right, const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue);
 	void Draw(const VkCommandBuffer& cmdBuffer) const;
 	void Destroy(const VkDevice& device);

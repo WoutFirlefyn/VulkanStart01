@@ -1,20 +1,41 @@
 #include "GP2Shader.h"
 #include "vulkanbase/VulkanUtil.h"
 #include "Vertex.h"
+#include "DescriptorPool.h"
+
+GP2Shader::GP2Shader(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
+	: m_VertexShaderFile{ vertexShaderFile }
+	, m_FragmentShaderFile{ fragmentShaderFile }
+	, m_ShaderStages{}
+	, m_InputBinding{ Vertex::GetBindingDescription() }
+	, m_AttributeDescriptions{ Vertex::GetAttributeDescriptions() }
+	, m_DescriptorSetLayout{}
+	, m_UBOSrc{}
+{
+}
+
+GP2Shader::~GP2Shader() = default;
 
 void GP2Shader::initialize(const VkPhysicalDevice& vkPhysicalDevice, const VkDevice& vkDevice)
 {
 	m_ShaderStages.push_back(createFragmentShaderInfo(vkDevice));
 	m_ShaderStages.push_back(createVertexShaderInfo(vkDevice));
 
-	m_UBOBuffer = std::make_unique<Buffer>();
-	m_UBOBuffer->CreateBuffer(
-		vkDevice,
+	m_UBOBuffer = std::make_unique<Buffer>(
 		vkPhysicalDevice,
-		sizeof(VertexUBO),
+		vkDevice,
 		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		sizeof(VertexUBO)
 	);
+}
+
+void GP2Shader::destroy(const VkDevice& vkDevice)
+{
+	vkDestroyDescriptorSetLayout(vkDevice, m_DescriptorSetLayout, nullptr);
+
+	m_UBOBuffer.reset();
+	m_DescriptorPool.reset();
 }
 
 void GP2Shader::destroyShaderModules(const VkDevice& vkDevice)
@@ -22,8 +43,6 @@ void GP2Shader::destroyShaderModules(const VkDevice& vkDevice)
 	for (VkPipelineShaderStageCreateInfo& stageInfo : m_ShaderStages)
 		vkDestroyShaderModule(vkDevice, stageInfo.module, nullptr);
 	m_ShaderStages.clear();
-
-	//vkDestroyDescriptorSetLayout(vkDevice, m_DescriptorSetLayout, nullptr);
 }
 
 VkPipelineShaderStageCreateInfo GP2Shader::createFragmentShaderInfo(const VkDevice& vkDevice) 
@@ -82,19 +101,22 @@ void GP2Shader::createDescriptorSetLayout(const VkDevice& vkDevice)
 	uboLayoutBinding.descriptorCount = 1;
 	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 	uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	layoutInfo.sType =
-		VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layoutInfo.bindingCount = 1;
 	layoutInfo.pBindings = &uboLayoutBinding;
+
 	if (vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
+	m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->getSizeInBytes(), 1);
 }
 
-void GP2Shader::bindDescriptorSet(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index)
+void GP2Shader::bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index)
 {
-	//vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &m_DescriptorSetLayout, 0, nullptr);
+	m_DescriptorPool->CreateDescriptorSets(m_DescriptorSetLayout, {m_UBOBuffer->GetVkBuffer()});
+	m_DescriptorPool->BindDescriptorSet(commandBuffer, pipelineLayout, index);
 }
 
 VkShaderModule GP2Shader::createShaderModule(const VkDevice& vkDevice, const std::vector<char>& code) 

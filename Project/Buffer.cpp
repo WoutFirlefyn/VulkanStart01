@@ -7,6 +7,13 @@
 // Member functions
 //---------------------------
 
+Buffer::Buffer(VkPhysicalDevice physicalDevice, VkDevice device, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize size)
+	: m_VkDevice{ device }
+	, m_VkDeviceSize{ size }
+{
+	CreateBuffer(device, physicalDevice, size, usage, properties);
+}
+
 void Buffer::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
 {
 	VkBufferCreateInfo bufferInfo{};
@@ -31,6 +38,17 @@ void Buffer::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDe
 	}
 
 	vkBindBufferMemory(device, m_Buffer, m_BufferMemory, 0);
+
+	m_VkDevice = device;
+	m_VkDeviceSize = size;
+}
+
+void Buffer::Upload(VkDeviceSize size, void* data)
+{
+}
+
+void Buffer::Map(VkDeviceSize size, void* data)
+{
 }
 
 uint32_t Buffer::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const
@@ -59,8 +77,8 @@ void Buffer::BindAsIndexBuffer(VkCommandBuffer commandBuffer) const
 	vkCmdBindIndexBuffer(commandBuffer, m_Buffer, 0,VK_INDEX_TYPE_UINT16);
 }
 
-void Buffer::DestroyBuffer(const VkDevice& device)
+void Buffer::DestroyBuffer()
 {
-	vkDestroyBuffer(device, m_Buffer, nullptr);
-	vkFreeMemory(device, m_BufferMemory, nullptr);
+	vkDestroyBuffer(m_VkDevice, m_Buffer, nullptr);
+	vkFreeMemory(m_VkDevice, m_BufferMemory, nullptr);
 }
