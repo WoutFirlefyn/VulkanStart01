@@ -8,7 +8,6 @@ class DescriptorPool
 public:
 	DescriptorPool(VkDevice device, VkDeviceSize size, size_t count);
 	~DescriptorPool();
-	void Initialize();
 	void CreateDescriptorSets(VkDescriptorSetLayout descriptorSetLayout,
 		std::initializer_list<VkBuffer> buffers);
 	void BindDescriptorSet(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);

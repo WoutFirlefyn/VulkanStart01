@@ -76,7 +76,7 @@ void Buffer::BindAsVertexBuffer(VkCommandBuffer commandBuffer)  const
 
 void Buffer::BindAsIndexBuffer(VkCommandBuffer commandBuffer) const
 {
-	vkCmdBindIndexBuffer(commandBuffer, m_Buffer, 0,VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, m_Buffer, 0,VK_INDEX_TYPE_UINT32);
 }
 
 void Buffer::DestroyBuffer()

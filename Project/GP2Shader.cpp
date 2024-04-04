@@ -36,6 +36,7 @@ void GP2Shader::initialize(const VkPhysicalDevice& vkPhysicalDevice, const VkDev
 	);
 
 	m_UBOBuffer->Map();
+	m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->GetSizeInBytes(), 1);
 }
 
 void GP2Shader::destroy(const VkDevice& vkDevice)
@@ -118,12 +119,10 @@ void GP2Shader::createDescriptorSetLayout(const VkDevice& vkDevice)
 	if (vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
-
 }
 
 void GP2Shader::createDescriptorSets(const VkDevice& vkDevice)
 {
-	m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->GetSizeInBytes(), 1);
 	m_DescriptorPool->CreateDescriptorSets(m_DescriptorSetLayout, { m_UBOBuffer->GetVkBuffer() });
 }
 
@@ -140,10 +139,10 @@ void GP2Shader::updateUniformBuffer(uint32_t currentImage, float aspectRatio, fl
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 	VertexUBO ubo{};
-	//ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	//ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	//ubo.proj = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 10.0f);
-	//ubo.proj[1][1] *= -1;
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 10.0f);
+	ubo.proj[1][1] *= -1;
 
 	m_UBOBuffer->Upload(ubo);
 }

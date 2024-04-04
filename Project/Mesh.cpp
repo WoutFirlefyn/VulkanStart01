@@ -21,7 +21,7 @@ void Mesh::Draw(const VkCommandBuffer& cmdBuffer) const
 	vkCmdDrawIndexed(cmdBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
 }
 
-void Mesh::AddVertex(const glm::vec2& pos, const glm::vec3& color)
+void Mesh::AddVertex(const glm::vec3& pos, const glm::vec3& color)
 {
 	m_vVertices.push_back(Vertex{ pos, color });
 }
@@ -31,11 +31,11 @@ void Mesh::AddVertex(const Vertex& vertex)
 	m_vVertices.push_back(vertex);
 }
 
-void Mesh::AddTriangle(uint16_t i1, uint16_t i2, uint16_t i3, uint16_t offset)
+void Mesh::AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset)
 {
 }
 
-void Mesh::SetIndices(const std::vector<uint16_t>& vIndices)
+void Mesh::SetIndices(const std::vector<uint32_t>& vIndices)
 {
 	m_vIndices = vIndices;
 }
@@ -72,7 +72,7 @@ void Mesh::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, 
 
 void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
-	VkDeviceSize bufferSize = sizeof(uint16_t) * m_vIndices.size();
+	VkDeviceSize bufferSize = sizeof(uint32_t) * m_vIndices.size();
 
 	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
 

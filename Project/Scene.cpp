@@ -25,11 +25,24 @@ void Scene::AddRectangle(float bottom, float left, float top, float right, const
 	//rect.Initialize(physicalDevice, device, commandPool, graphicsQueue);
 	//m_vMeshes.push_back(std::move(rect));
 
-	const std::vector<Vertex> vertices = {
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	//const std::vector<Vertex> vertices = {
+	//{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	//{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+	//{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+	//{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	//};
+
+	const std::vector<Vertex> vertices = 
+	{
+		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+		{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+		{{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+
+		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
 	};
 
 	Mesh rect{};
@@ -37,7 +50,7 @@ void Scene::AddRectangle(float bottom, float left, float top, float right, const
 	for (const auto& vertex : vertices)
 		rect.AddVertex(vertex);
 
-	rect.SetIndices(std::vector<uint16_t> { 0, 1, 2, 2, 3, 0 });
+	rect.SetIndices(std::vector<uint32_t> { 0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 });
 	rect.Initialize(physicalDevice, device, commandPool, graphicsQueue);
 	m_vMeshes.push_back(std::move(rect));
 }

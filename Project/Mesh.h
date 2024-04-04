@@ -45,11 +45,11 @@ public:
 
 	void Draw(/*VkPipelineLayout pipelineLayout, */const VkCommandBuffer& cmdBuffer) const;
 
-	void AddVertex(const glm::vec2& pos, const glm::vec3& color);
+	void AddVertex(const glm::vec3& pos, const glm::vec3& color);
 	void AddVertex(const Vertex& vertex); 
-    void AddTriangle(uint16_t i1, uint16_t i2, uint16_t i3, uint16_t offset = 0);
+    void AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset = 0);
 
-	void SetIndices(const std::vector<uint16_t>& vIndices);
+	void SetIndices(const std::vector<uint32_t>& vIndices);
 
 	std::vector<Vertex> GetVertices() const { return m_vVertices; }
 	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue);
@@ -61,7 +61,7 @@ private:
 	std::unique_ptr<Buffer> m_VertexBuffer;
 	std::unique_ptr<Buffer> m_IndexBuffer;
 	std::vector<Vertex> m_vVertices{};
-	std::vector<uint16_t> m_vIndices{};
+	std::vector<uint32_t> m_vIndices{};
 
 	//VertexConstant m_VertexConstant;
 };

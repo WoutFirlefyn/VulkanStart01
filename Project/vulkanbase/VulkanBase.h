@@ -78,10 +78,11 @@ private:
 		createRenderPass();
 		m_GradientShader.createDescriptorSetLayout(device);
 		createGraphicsPipeline();
-		createFrameBuffers();
 
 		// week 02
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
+		createDepthResources();
+		createFrameBuffers();
 		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_GradientShader.createDescriptorSets(device);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
@@ -120,6 +121,12 @@ private:
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
+
+		// this shit should probably have an abstraction
+		vkDestroyImageView(device, depthImageView, nullptr);
+		vkDestroyImage(device, depthImage, nullptr);
+		vkFreeMemory(device, depthImageMemory, nullptr);
+		//
 
 		m_Scene.Destroy(device);
 
@@ -160,7 +167,6 @@ private:
 
 	CommandPool m_CommandPool;
 	CommandBuffer m_CommandBuffer;
-	//Mesh m_Mesh{};
 	Scene m_Scene{};
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
@@ -180,6 +186,21 @@ private:
 	void createFrameBuffers();
 	void createRenderPass(); 
 	void createGraphicsPipeline();
+
+	// this shit should probably be in its own class but idc
+
+	VkImage depthImage;
+	VkDeviceMemory depthImageMemory;
+	VkImageView depthImageView;
+
+	void createDepthResources(); 
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	VkFormat findDepthFormat();
+	bool hasStencilComponent(VkFormat format);
+	uint32_t findMemoryType(uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const;
+	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+	////
 
 	// Week 04
 	// Swap chain and image view support
