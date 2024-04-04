@@ -46,6 +46,7 @@ void VulkanBase::drawFrame()
 
 	m_CommandBuffer.Reset();
 	m_CommandBuffer.BeginRecording();
+	m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
 	drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
 	m_CommandBuffer.EndRecording();
 

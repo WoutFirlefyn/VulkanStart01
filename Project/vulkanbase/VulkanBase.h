@@ -83,8 +83,8 @@ private:
 		// week 02
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
 		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
+		m_GradientShader.createDescriptorSets(device);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
-		m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
 
 		// week 06
 		createSyncObjects();

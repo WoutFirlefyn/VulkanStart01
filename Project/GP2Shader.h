@@ -22,6 +22,7 @@ public:
 
 	// UBO binding
 	void createDescriptorSetLayout(const VkDevice& vkDevice);
+	void createDescriptorSets(const VkDevice& vkDevice);
 	const VkDescriptorSetLayout& getDescriptorSetLayout() const{ return m_DescriptorSetLayout; }
 	void bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);
 private:

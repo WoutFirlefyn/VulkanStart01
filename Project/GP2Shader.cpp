@@ -110,12 +110,17 @@ void GP2Shader::createDescriptorSetLayout(const VkDevice& vkDevice)
 	if (vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
-	m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->getSizeInBytes(), 1);
+
+}
+
+void GP2Shader::createDescriptorSets(const VkDevice& vkDevice)
+{
+	m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->getSizeInBytes(), 2);
+	m_DescriptorPool->CreateDescriptorSets(m_DescriptorSetLayout, { m_UBOBuffer->GetVkBuffer() });
 }
 
 void GP2Shader::bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index)
 {
-	m_DescriptorPool->CreateDescriptorSets(m_DescriptorSetLayout, {m_UBOBuffer->GetVkBuffer()});
 	m_DescriptorPool->BindDescriptorSet(commandBuffer, pipelineLayout, index);
 }
 
