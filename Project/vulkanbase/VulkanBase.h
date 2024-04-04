@@ -85,7 +85,7 @@ private:
 		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_GradientShader.createDescriptorSets(device);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
-
+		
 		// week 06
 		createSyncObjects();
 	}

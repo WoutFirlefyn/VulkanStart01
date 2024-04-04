@@ -4,6 +4,7 @@
 // Include Files
 //-----------------------------------------------------
 #include "vulkanbase/VulkanUtil.h"
+#include "Vertex.h"
 
 //-----------------------------------------------------
 // Buffer Class									
@@ -59,13 +60,13 @@ public:
 	void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, 
 		VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
 
-	void Upload(VkDeviceSize size, void* data);
-	void Map(VkDeviceSize size, void* data);
+	void Upload(VertexUBO& ubo);
+	void Map();
 	void BindAsVertexBuffer(VkCommandBuffer commandBuffer) const;
 	void BindAsIndexBuffer(VkCommandBuffer commandBuffer) const;
 	const VkBuffer& GetVkBuffer() const { return m_Buffer; }
 	const VkDeviceMemory& GetVkBufferMemory() const { return m_BufferMemory; }
-	VkDeviceSize getSizeInBytes() const { return m_VkDeviceSize; }
+	VkDeviceSize GetSizeInBytes() const { return m_VkDeviceSize; }
 
 private: 
 	uint32_t FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const;
@@ -74,6 +75,7 @@ private:
 	VkDeviceSize m_VkDeviceSize{};
 	VkBuffer m_Buffer{};
 	VkDeviceMemory m_BufferMemory{};	
+	void* m_UniformBufferMapped{};
 };
 
  

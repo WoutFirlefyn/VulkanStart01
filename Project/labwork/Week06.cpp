@@ -43,12 +43,14 @@ void VulkanBase::drawFrame()
 
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-
+	
 	m_CommandBuffer.Reset();
 	m_CommandBuffer.BeginRecording();
 	m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
 	drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
 	m_CommandBuffer.EndRecording();
+
+	m_GradientShader.updateUniformBuffer(imageIndex, swapChainExtent.width / (float)swapChainExtent.height, 45.f);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

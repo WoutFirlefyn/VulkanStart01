@@ -43,12 +43,14 @@ void Buffer::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDe
 	m_VkDeviceSize = size;
 }
 
-void Buffer::Upload(VkDeviceSize size, void* data)
+void Buffer::Upload(VertexUBO& ubo)
 {
+	memcpy(m_UniformBufferMapped, &ubo, m_VkDeviceSize);
 }
 
-void Buffer::Map(VkDeviceSize size, void* data)
+void Buffer::Map()
 {
+	vkMapMemory(m_VkDevice, m_BufferMemory, 0, m_VkDeviceSize, 0, &m_UniformBufferMapped);
 }
 
 uint32_t Buffer::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const

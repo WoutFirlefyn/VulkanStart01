@@ -25,6 +25,7 @@ public:
 	void createDescriptorSets(const VkDevice& vkDevice);
 	const VkDescriptorSetLayout& getDescriptorSetLayout() const{ return m_DescriptorSetLayout; }
 	void bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);
+	void updateUniformBuffer(uint32_t currentImage, float aspectRatio, float fov);
 private:
 	VkPipelineShaderStageCreateInfo createFragmentShaderInfo(const VkDevice& vkDevice);
 	VkPipelineShaderStageCreateInfo createVertexShaderInfo(const VkDevice& vkDevice);
