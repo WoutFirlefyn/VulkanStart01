@@ -13,9 +13,6 @@ GP2Shader::GP2Shader(const std::string& vertexShaderFile, const std::string& fra
 	: m_VertexShaderFile{ vertexShaderFile }
 	, m_FragmentShaderFile{ fragmentShaderFile }
 	, m_ShaderStages{}
-	//, m_InputBinding{ Vertex::GetBindingDescription() }
-	//, m_AttributeDescriptions{ Vertex::GetAttributeDescriptions() }
-	//, m_DescriptorSetLayout{}
 	, m_UBOSrc{}
 {
 }
@@ -36,7 +33,6 @@ void GP2Shader::initialize(const VkPhysicalDevice& vkPhysicalDevice, const VkDev
 	);
 
 	m_UBOBuffer->Map();
-	//m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->GetSizeInBytes(), 1);
 }
 
 void GP2Shader::initialize(const VulkanContext& context)
@@ -149,7 +145,7 @@ void GP2Shader::updateUniformBuffer(uint32_t currentImage, float aspectRatio, fl
 	ubo.proj = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 10.0f);
 	ubo.proj[1][1] *= -1;
 
-	m_UBOBuffer->Upload(ubo);
+	//m_UBOBuffer->Upload(ubo);
 }
 
 VkShaderModule GP2Shader::createShaderModule(const VkDevice& vkDevice, const std::vector<char>& code) 

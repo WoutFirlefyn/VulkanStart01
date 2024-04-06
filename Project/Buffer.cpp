@@ -48,9 +48,9 @@ void Buffer::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDe
 	m_VkDeviceSize = size;
 }
 
-void Buffer::Upload(VertexUBO& ubo)
+void Buffer::Upload(void* data)
 {
-	memcpy(m_UniformBufferMapped, &ubo, m_VkDeviceSize);
+	memcpy(m_UniformBufferMapped, data, m_VkDeviceSize);
 }
 
 void Buffer::Map()

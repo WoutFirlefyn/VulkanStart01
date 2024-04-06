@@ -5,6 +5,7 @@ template <class UBO>
 class UniformBufferObject
 {
 public:
+	~UniformBufferObject() { m_UBOBuffer.reset(); }
 	void Initialize(const VulkanContext& context);
 	void Upload();
 	void SetData(UBO ubo) { m_UBOSrc = ubo; }
@@ -23,12 +24,13 @@ inline void UniformBufferObject<UBO>::Initialize(const VulkanContext& context)
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		sizeof(UBO)
 	);
+	m_UBOBuffer->Map();
 }
 
 template<class UBO>
 inline void UniformBufferObject<UBO>::Upload()
 {
-	m_UBOBuffer->Upload(sizeof(UBO), &m_UBOSrc);
+	m_UBOBuffer->Upload(&m_UBOSrc);
 }
 
 template<class UBO>

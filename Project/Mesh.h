@@ -9,59 +9,66 @@
 class Mesh
 {
 public:
-	Mesh() = default;
 	~Mesh() = default;
 
-    // Copy constructor
     Mesh(const Mesh& other) = delete;
-
-    // Move constructor
-    Mesh(Mesh&& other) noexcept
-        : m_VertexBuffer(std::move(other.m_VertexBuffer)),
-        m_IndexBuffer(std::move(other.m_IndexBuffer)),
-        m_vVertices(std::move(other.m_vVertices)),
-        m_vIndices(std::move(other.m_vIndices)) 
-    {
-    }
-
-    // Copy assignment operator
+    Mesh(Mesh&& other) noexcept = delete;
     Mesh& operator=(const Mesh& other) = delete;
-
-    // Move assignment operator
-    Mesh& operator=(Mesh&& other) noexcept 
-    {
-        if (this != &other) {
-            m_VertexBuffer = std::move(other.m_VertexBuffer);
-            m_IndexBuffer = std::move(other.m_IndexBuffer);
-            m_vVertices = std::move(other.m_vVertices);
-            m_vIndices = std::move(other.m_vIndices);
-        }
-        return *this;
-    }
+    Mesh& operator=(Mesh&& other) noexcept = delete;
 
 	void Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue);
 
 	void DestroyMesh(const VkDevice& device);
 
-	void Draw(/*VkPipelineLayout pipelineLayout, */const VkCommandBuffer& cmdBuffer) const;
+	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const = 0;
 
-	void AddVertex(const glm::vec3& pos, const glm::vec3& color);
-	void AddVertex(const Vertex& vertex); 
     void AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset = 0);
 
 	void SetIndices(const std::vector<uint32_t>& vIndices);
 
-	std::vector<Vertex> GetVertices() const { return m_vVertices; }
 	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue);
-private:
-	//uint32_t FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const;
-	void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
-	void CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
-
+protected:
+	Mesh() = default;
 	std::unique_ptr<Buffer> m_VertexBuffer;
 	std::unique_ptr<Buffer> m_IndexBuffer;
-	std::vector<Vertex> m_vVertices{};
 	std::vector<uint32_t> m_vIndices{};
 
-	//VertexConstant m_VertexConstant;
+private:
+	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;
+	void CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
+};
+
+class Mesh2D : public Mesh
+{
+public:
+	Mesh2D() : Mesh()
+	{
+	}
+	~Mesh2D() = default;
+	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
+	void AddVertex(const glm::vec2& pos, const glm::vec3& color);
+	void AddVertex(const Vertex2D& vertex);
+	std::vector<Vertex2D> GetVertices() const { return m_vVertices; }
+private:
+	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
+
+	std::vector<Vertex2D> m_vVertices{};
+};
+
+class Mesh3D : public Mesh
+{
+public:
+	Mesh3D() : Mesh()
+	{
+	}
+	~Mesh3D() = default;
+	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
+	void AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color);
+	void AddVertex(const Vertex3D& vertex);
+	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
+private:
+	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
+
+	std::vector<Vertex3D> m_vVertices{};
+	MeshData m_VertexConstant{ glm::mat4(1) };
 };

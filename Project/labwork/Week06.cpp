@@ -48,13 +48,51 @@ void VulkanBase::drawFrame()
 	m_CommandBuffer.Reset();
 	m_CommandBuffer.BeginRecording();
 
-	//beginRenderPass(m_CommandBuffer, swapChainFramebuffers[imageIndex], swapChainExtent);
+	beginRenderPass(m_CommandBuffer, swapChainFramebuffers[imageIndex], swapChainExtent);
+
+	// 2D Camera matrix
+	ViewProjection vp{};
+	glm::vec3 scaleFactors(1 / 400.0f, 1 / 300.0f, 1.0f);
+	vp.view = glm::scale(glm::mat4(1.0f), scaleFactors);
+	vp.view = glm::translate(vp.view, glm::vec3(-1, -1, 0));
+	// draw pipeline 1.
+	//m_GraphicsPipeline2D.SetUBO(vp, 0);
+	//m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+	// 3D camera matrix.
+	glm::vec3 cameraPos = glm::vec3(m_Radius * cosf(m_Rotation), -6, m_Radius * sinf(m_Rotation));
+	glm::vec3 targetPos = glm::vec3(0, 0, 0);
+	glm::vec3 upVector = glm::vec3(0, 1, 0);
+	//m_Rotation += 0.001f;
+
+	// Window dimensions
+	float windowWidth = swapChainExtent.width;
+	float windowHeight = swapChainExtent.height;
+	float aspectRatio = windowWidth / windowHeight;
+
+	// Field of View
+	float fov = 45.0f; // In degrees
+
+	// Near and Far planes
+	float nearPlane = 0.1f;
+	float farPlane = 100.0f;
+
+	// View matrix
+	vp.view = glm::lookAt(cameraPos, targetPos, upVector);
+
+	// Projection matrix
+	vp.proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+	//// draw pipeline 2.
+	m_GraphicsPipeline3D.SetUBO(vp, 0);
+	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent);
+	// end the render pass
+	endRenderPass(m_CommandBuffer);
+
 
 	//m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
-	drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
+	//drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
 	m_CommandBuffer.EndRecording();
 
-	m_GradientShader.updateUniformBuffer(imageIndex, swapChainExtent.width / (float)swapChainExtent.height, 45.f);
+	//m_GradientShader.updateUniformBuffer(imageIndex, swapChainExtent.width / (float)swapChainExtent.height, 45.f);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -193,9 +231,12 @@ void VulkanBase::beginRenderPass(const CommandBuffer& buffer, VkFramebuffer curr
 	renderPassInfo.framebuffer = currentBuffer;
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = extent;
-	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
+	std::array<VkClearValue, 2> clearValues{};
+	clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+	clearValues[1].depthStencil = { 1.0f, 0 };
+
+	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+	renderPassInfo.pClearValues = clearValues.data();
 	vkCmdBeginRenderPass(buffer.GetVkCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 void VulkanBase::endRenderPass(const CommandBuffer& buffer) 

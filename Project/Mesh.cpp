@@ -14,23 +14,6 @@ void Mesh::DestroyMesh(const VkDevice& device)
 	m_IndexBuffer.reset();
 }
 
-void Mesh::Draw(const VkCommandBuffer& cmdBuffer) const
-{
-	m_VertexBuffer->BindAsVertexBuffer(cmdBuffer);
-	m_IndexBuffer->BindAsIndexBuffer(cmdBuffer);
-	vkCmdDrawIndexed(cmdBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
-}
-
-void Mesh::AddVertex(const glm::vec3& pos, const glm::vec3& color)
-{
-	m_vVertices.push_back(Vertex{ pos, color });
-}
-
-void Mesh::AddVertex(const Vertex& vertex)
-{
-	m_vVertices.push_back(vertex);
-}
-
 void Mesh::AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset)
 {
 }
@@ -54,25 +37,9 @@ void Mesh::SetIndices(const std::vector<uint32_t>& vIndices)
 //	throw std::runtime_error("failed to find suitable memory type!");
 //}
 
-void Mesh::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
-{
-	VkDeviceSize bufferSize = sizeof(Vertex) * m_vVertices.size();
-
-	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
-
-	void* data;
-	vkMapMemory(device, stagingBuffer.GetVkBufferMemory(), 0, bufferSize, 0, &data);
-	memcpy(data, m_vVertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(device, stagingBuffer.GetVkBufferMemory());
-
-	m_VertexBuffer = std::make_unique<Buffer>(physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
-
-	CopyBuffer(device, commandPool, stagingBuffer, *m_VertexBuffer, bufferSize, graphicsQueue);
-}
-
 void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
-	VkDeviceSize bufferSize = sizeof(uint32_t) * m_vIndices.size();
+	VkDeviceSize bufferSize = sizeof(decltype(m_vIndices)::value_type) * m_vIndices.size();
 
 	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
 
@@ -111,3 +78,84 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 
 	 commandBuffer.FreeBuffer(device, commandPool);
  }
+
+ //////////////////////////////////////////////
+
+ void Mesh2D::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkCommandBuffer) const
+ {
+	 m_VertexBuffer->BindAsVertexBuffer(vkCommandBuffer);
+	 m_IndexBuffer->BindAsIndexBuffer(vkCommandBuffer);
+
+	 vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
+ }
+
+ void Mesh2D::AddVertex(const glm::vec2& pos, const glm::vec3& color)
+ {
+	 m_vVertices.push_back(Vertex2D{ pos, color });
+ }
+
+ void Mesh2D::AddVertex(const Vertex2D& vertex)
+ {
+	 m_vVertices.push_back(vertex);
+ }
+
+void Mesh2D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
+{
+	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();
+
+	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
+
+	void* data;
+	vkMapMemory(device, stagingBuffer.GetVkBufferMemory(), 0, bufferSize, 0, &data);
+	memcpy(data, m_vVertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, stagingBuffer.GetVkBufferMemory());
+
+	m_VertexBuffer = std::make_unique<Buffer>(physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+	CopyBuffer(device, commandPool, stagingBuffer, *m_VertexBuffer, bufferSize, graphicsQueue);
+}
+
+ //////////////////////////////////////////////
+
+void Mesh3D::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkCommandBuffer) const
+{
+	m_VertexBuffer->BindAsVertexBuffer(vkCommandBuffer);
+	m_IndexBuffer->BindAsIndexBuffer(vkCommandBuffer);
+
+	vkCmdPushConstants(
+		vkCommandBuffer,
+		pipelineLayout,
+		VK_SHADER_STAGE_VERTEX_BIT, // Stage flag should match the push constant range in the layout
+		0, // Offset within the push constant block
+		sizeof(MeshData), // Size of the push constants to update
+		&m_VertexConstant // Pointer to the data
+	);
+
+	vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
+}
+
+ void Mesh3D::AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color)
+ {
+	 m_vVertices.push_back(Vertex3D{ pos, normal, color });
+ }
+
+ void Mesh3D::AddVertex(const Vertex3D& vertex)
+ {
+	 m_vVertices.push_back(vertex);
+ }
+
+void Mesh3D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
+{
+	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();
+
+	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
+
+	void* data;
+	vkMapMemory(device, stagingBuffer.GetVkBufferMemory(), 0, bufferSize, 0, &data);
+	memcpy(data, m_vVertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, stagingBuffer.GetVkBufferMemory());
+
+	m_VertexBuffer = std::make_unique<Buffer>(physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, bufferSize);
+
+	CopyBuffer(device, commandPool, stagingBuffer, *m_VertexBuffer, bufferSize, graphicsQueue);
+}

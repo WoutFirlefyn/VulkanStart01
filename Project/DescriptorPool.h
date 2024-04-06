@@ -47,7 +47,7 @@ inline DescriptorPool<UBO>::DescriptorPool(VkDevice device, size_t count)
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = 1;
 	poolInfo.pPoolSizes = &poolSize;
-	poolInfo.maxSets = count;
+	poolInfo.maxSets = static_cast<uint32_t>(count);
 
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
@@ -81,7 +81,7 @@ void DescriptorPool<UBO>::CreateDescriptorSets()
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = m_DescriptorPool;
-	allocInfo.descriptorSetCount = m_Count;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(m_Count);
 	allocInfo.pSetLayouts = layouts.data();
 
 	m_vDescriptorSets.resize(m_Count);

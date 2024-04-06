@@ -23,7 +23,6 @@ add_custom_target(
     DEPENDS ${SPIRV_BINARY_FILES}
 )
 
-
 set(SOURCES
     "main.cpp"
     "vulkanbase/VulkanBase.h" 
@@ -52,7 +51,11 @@ set(SOURCES
     "DescriptorPool.h" 
     "DescriptorPool.cpp"
     "Utils.h"
- "GraphicsPipeline.h" "GraphicsPipeline.cpp" "UniformBufferObject.h" )
+    "GraphicsPipeline.h" 
+    "GraphicsPipeline.cpp" 
+    "UniformBufferObject.h"
+)
+
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )

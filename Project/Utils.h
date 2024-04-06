@@ -4,10 +4,11 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include "Vertex.h"
+#include <iostream>
 //Just parses vertices and indices
 #pragma warning(push)
 #pragma warning(disable : 4505) //Warning unreferenced local function
-static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true)
+static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true)
 {
 #ifdef DISABLE_OBJ
 
@@ -17,12 +18,16 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices,
 
 #else
 	std::ifstream file(filename);
-	if (!file)
+
+	if (!file.is_open())
+	{
+		std::cerr << "Failed to open " << filename << std::endl;
 		return false;
+	}
 
 	std::vector<glm::vec3> positions{};
-	//std::vector<Vector3> normals{};
-	//std::vector<Vector2> UVs{};
+	std::vector<glm::vec3> normals{};
+	//std::vector<glm::vec2> UVs{};
 
 	vertices.clear();
 	indices.clear();
@@ -56,10 +61,10 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices,
 		else if (sCommand == "vn")
 		{
 			// Vertex Normal
-			//float x, y, z;
-			//file >> x >> y >> z;
+			float x, y, z;
+			file >> x >> y >> z;
 
-			//normals.emplace_back(x, y, z);
+			normals.emplace_back(x, y, z);
 		}
 		else if (sCommand == "f")
 		{
@@ -69,8 +74,8 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices,
 			//add the material index as attibute to the attribute array
 			//
 			// Faces or triangles
-			Vertex vertex{};
-			size_t iPosition;// , iTexCoord, iNormal;
+			Vertex3D vertex{};
+			size_t iPosition, iNormal , iTexCoord;
 
 			uint32_t tempIndices[3]{};
 			for (size_t iFace = 0; iFace < 3; iFace++)
@@ -86,7 +91,7 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices,
 					if ('/' != file.peek())
 					{
 						// Optional texture coordinate
-						//file >> iTexCoord;
+						file >> iTexCoord;
 						//vertex.uv = UVs[iTexCoord - 1];
 					}
 
@@ -95,8 +100,8 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices,
 						file.ignore();
 
 						// Optional vertex normal
-						//file >> iNormal;
-						//vertex.normal = normals[iNormal - 1];
+						file >> iNormal;
+						vertex.normal = normals[iNormal - 1];
 					}
 				}
 
@@ -148,18 +153,18 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices,
 	//}
 
 	//Fix the tangents per vertex now because we accumulated
-	//for (auto& v : vertices)
-	//{
+	for (auto& v : vertices)
+	{
 	//	v.tangent = Vector3::Reject(v.tangent, v.normal).Normalized();
 
-	//	if (flipAxisAndWinding)
-	//	{
-	//		v.position.z *= -1.f;
-	//		v.normal.z *= -1.f;
-	//		v.tangent.z *= -1.f;
-	//	}
+		if (flipAxisAndWinding)
+		{
+			v.pos.z *= -1.f;
+			v.normal.z *= -1.f;
+			//v.tangent.z *= -1.f;
+		}
 
-	//}
+	}
 
 	return true;
 }

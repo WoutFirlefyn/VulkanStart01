@@ -44,7 +44,7 @@ public:
 	void CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, 
 		VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
 
-	void Upload(VertexUBO& ubo);
+	void Upload(void* data);
 	void Map();
 	void BindAsVertexBuffer(VkCommandBuffer commandBuffer) const;
 	void BindAsIndexBuffer(VkCommandBuffer commandBuffer) const;

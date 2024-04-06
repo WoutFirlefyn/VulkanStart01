@@ -34,35 +34,35 @@ void Scene::AddRectangle(float bottom, float left, float top, float right, const
 	//};
 
 	
-	const std::vector<Vertex> vertices = 
-	{
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-		{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-		{{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-		{{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+	//const std::vector<Vertex3D> vertices = 
+	//{
+	//	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+	//	{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+	//	{{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+	//	{{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
 
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-		{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
-		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
-	};
+	//	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	//	{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+	//	{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
+	//	{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
+	//};
 	//std::vector<uint32_t> indices{};
 	//ParseOBJ("C:/2DAE/ToolDevelopment/MinecraftTool/out/build/x64 - debug/MinecraftToolCmd/minecraftScene.obj", vertices, indices);
 
-	Mesh rect{};
+	//Mesh rect{};
 
-	for (const auto& vertex : vertices)
-		rect.AddVertex(vertex);
+	//for (const auto& vertex : vertices)
+	//	rect.AddVertex(vertex);
 
-	rect.SetIndices(std::vector<uint32_t> { 0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 });
-	rect.Initialize(physicalDevice, device, commandPool, graphicsQueue);
-	m_vMeshes.push_back(std::move(rect));
+	//rect.SetIndices(std::vector<uint32_t> { 0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 });
+	//rect.Initialize(physicalDevice, device, commandPool, graphicsQueue);
+	//m_vMeshes.push_back(std::move(rect));
 }
 
 void Scene::Draw(const VkCommandBuffer& cmdBuffer) const
 {
-	for (const auto& mesh : m_vMeshes)
-		mesh.Draw(cmdBuffer);
+	//for (const auto& mesh : m_vMeshes)
+	//	mesh.Draw(cmdBuffer);
 }
 
 void Scene::Destroy(const VkDevice& device)

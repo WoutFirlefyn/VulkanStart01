@@ -25,6 +25,7 @@
 #include "Mesh.h"
 #include "Scene.h"
 #include "GraphicsPipeline.h"
+#include "Utils.h"
 
 
 const std::vector<const char*> validationLayers = {
@@ -79,7 +80,8 @@ private:
 		//m_GradientShader.initialize(physicalDevice, device);
 		createRenderPass();
 		
-		m_GraphicsPipeline.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
+		m_GraphicsPipeline2D.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
+		m_GraphicsPipeline3D.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
 		//m_GradientShader.createDescriptorSetLayout(device);
 		//createGraphicsPipeline();
 
@@ -87,7 +89,42 @@ private:
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
 		createDepthResources();
 		createFrameBuffers();
-		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
+		auto mesh2D = std::make_unique<Mesh2D>();
+		const std::vector<Vertex2D> vertices2D = 
+		{
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+		};
+		for (const auto& vertex : vertices2D)
+			mesh2D->AddVertex(vertex);
+		mesh2D->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
+		mesh2D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
+		m_GraphicsPipeline2D.AddMesh(std::move(mesh2D));
+		auto mesh3D = std::make_unique<Mesh3D>();
+		/*const */std::vector<Vertex3D> vertices3D = 
+		{
+			//{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+			//{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			//{{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+			//{{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+
+			//{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			//{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+			//{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
+			//{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
+		};
+		std::vector<uint32_t> indices{};
+		ParseOBJ("resources/vehicle.obj", vertices3D, indices);
+		for (const auto& vertex : vertices3D)
+			mesh3D->AddVertex(vertex);
+
+		//mesh3D->SetIndices(std::vector<uint32_t> { 0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 });
+		mesh3D->SetIndices(indices);
+		mesh3D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
+		m_GraphicsPipeline3D.AddMesh(std::move(mesh3D));
+		//m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
 		//m_GradientShader.createDescriptorSets(device);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		
@@ -114,8 +151,9 @@ private:
 		for (auto framebuffer : swapChainFramebuffers)
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
 
-		vkDestroyPipeline(device, graphicsPipeline, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		m_GraphicsPipeline2D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
+		m_GraphicsPipeline3D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
+
 		vkDestroyRenderPass(device, renderPass, nullptr);
 
 		for (auto imageView : swapChainImageViews)
@@ -163,8 +201,6 @@ private:
 	GLFWwindow* window;
 	void initWindow();
 
-	void drawScene();
-
 	// Week 02
 	// Queue families
 	// CommandBuffer concept
@@ -185,9 +221,13 @@ private:
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
 	VkRenderPass renderPass;
-	GraphicsPipeline m_GraphicsPipeline{
+	GraphicsPipeline2D m_GraphicsPipeline2D{
 		"shaders/shader.vert.spv",
 		"shaders/shader.frag.spv"
+	};
+	GraphicsPipeline3D m_GraphicsPipeline3D{
+		"shaders/objshader.vert.spv",
+		"shaders/objshader.frag.spv"
 	};
 
 
@@ -261,6 +301,16 @@ private:
 
 	void createSyncObjects();
 	void drawFrame();
+
+	////////////
+	// Camera //
+	////////////
+	void keyEvent(int key, int scancode, int action, int mods);
+	void mouseMove(GLFWwindow* window, double xpos, double ypos);
+	void mouseEvent(GLFWwindow* window, int button, int action, int mods);
+	float m_Radius{};
+	double m_Rotation{};
+	glm::vec2 m_DragStart{};
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
