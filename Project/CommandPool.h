@@ -13,12 +13,12 @@
 struct QueueFamilyIndices;
 class CommandPool final
 {
-public:													// Constructor
+public:													
 	CommandPool() : m_CommandPool{ VK_NULL_HANDLE }, m_VkDevice{ VK_NULL_HANDLE }
 	{
 	}
 
-	~CommandPool() = default;				// Destructor
+	~CommandPool() = default;
 
 	// -------------------------
 	// Copy/move constructors and assignment operators
@@ -38,14 +38,7 @@ public:													// Constructor
 
 	const VkCommandPool& GetCommandPool() const { return m_CommandPool; }
 
-private: 
-	//-------------------------------------------------
-	// Private member functions								
-	//-------------------------------------------------
-
-	//-------------------------------------------------
-	// Datamembers								
-	//-------------------------------------------------
+private:
 	VkCommandPool m_CommandPool{};
 	VkDevice m_VkDevice{};
 };

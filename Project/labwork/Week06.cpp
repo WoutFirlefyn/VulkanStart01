@@ -1,4 +1,5 @@
 #include "vulkanbase/VulkanBase.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 void VulkanBase::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {};
@@ -47,7 +48,9 @@ void VulkanBase::drawFrame()
 	m_CommandBuffer.Reset();
 	m_CommandBuffer.BeginRecording();
 
-	m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
+	//beginRenderPass(m_CommandBuffer, swapChainFramebuffers[imageIndex], swapChainExtent);
+
+	//m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
 	drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
 	m_CommandBuffer.EndRecording();
 
@@ -180,4 +183,22 @@ void VulkanBase::createInstance() {
 	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create instance!");
 	}
+}
+
+void VulkanBase::beginRenderPass(const CommandBuffer& buffer, VkFramebuffer currentBuffer, VkExtent2D extent)
+{
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = renderPass;
+	renderPassInfo.framebuffer = currentBuffer;
+	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.extent = extent;
+	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearColor;
+	vkCmdBeginRenderPass(buffer.GetVkCommandBuffer(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+void VulkanBase::endRenderPass(const CommandBuffer& buffer) 
+{
+	vkCmdEndRenderPass(buffer.GetVkCommandBuffer());
 }

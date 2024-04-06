@@ -24,6 +24,7 @@
 #include "Vertex.h"
 #include "Mesh.h"
 #include "Scene.h"
+#include "GraphicsPipeline.h"
 
 
 const std::vector<const char*> validationLayers = {
@@ -59,7 +60,8 @@ public:
 	}
 
 private:
-	void initVulkan() {
+	void initVulkan() 
+	{
 		// week 06
 		createInstance();
 		setupDebugMessenger();
@@ -74,17 +76,19 @@ private:
 		createImageViews();
 		
 		// week 03
-		m_GradientShader.initialize(physicalDevice, device);
+		//m_GradientShader.initialize(physicalDevice, device);
 		createRenderPass();
-		m_GradientShader.createDescriptorSetLayout(device);
-		createGraphicsPipeline();
+		
+		m_GraphicsPipeline.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
+		//m_GradientShader.createDescriptorSetLayout(device);
+		//createGraphicsPipeline();
 
 		// week 02
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
 		createDepthResources();
 		createFrameBuffers();
 		m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
-		m_GradientShader.createDescriptorSets(device);
+		//m_GradientShader.createDescriptorSets(device);
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		
 		// week 06
@@ -181,6 +185,10 @@ private:
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
 	VkRenderPass renderPass;
+	GraphicsPipeline m_GraphicsPipeline{
+		"shaders/shader.vert.spv",
+		"shaders/shader.frag.spv"
+	};
 
 
 	void createFrameBuffers();
@@ -247,6 +255,9 @@ private:
 	std::vector<const char*> getRequiredExtensions();
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	void createInstance();
+
+	void beginRenderPass(const CommandBuffer& buffer, VkFramebuffer currentBuffer, VkExtent2D extent);
+	void endRenderPass(const CommandBuffer& buffer);
 
 	void createSyncObjects();
 	void drawFrame();

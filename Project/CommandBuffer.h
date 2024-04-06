@@ -37,14 +37,6 @@ public:
 	void Submit(VkSubmitInfo& info) const;
 
 private: 
-	//-------------------------------------------------
-	// Private member functions								
-	//-------------------------------------------------
-
-
-	//-------------------------------------------------
-	// Datamembers								
-	//-------------------------------------------------
 	VkCommandBuffer m_CommandBuffer{};
 };
 

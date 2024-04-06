@@ -51,7 +51,8 @@ set(SOURCES
     "Buffer.cpp"
     "DescriptorPool.h" 
     "DescriptorPool.cpp"
-)
+    "Utils.h"
+ "GraphicsPipeline.h" "GraphicsPipeline.cpp" "UniformBufferObject.h" )
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )

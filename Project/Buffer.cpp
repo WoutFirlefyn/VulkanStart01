@@ -14,6 +14,11 @@ Buffer::Buffer(VkPhysicalDevice physicalDevice, VkDevice device, VkBufferUsageFl
 	CreateBuffer(device, physicalDevice, size, usage, properties);
 }
 
+Buffer::Buffer(VulkanContext context, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize size)
+	: Buffer(context.physicalDevice, context.device, usage, properties, size)
+{
+}
+
 void Buffer::CreateBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
 {
 	VkBufferCreateInfo bufferInfo{};

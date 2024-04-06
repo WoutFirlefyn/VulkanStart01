@@ -120,7 +120,7 @@ void VulkanBase::createGraphicsPipeline() {
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &m_GradientShader.getDescriptorSetLayout();
+	//pipelineLayoutInfo.pSetLayouts = &m_GradientShader.getDescriptorSetLayout();
 	pipelineLayoutInfo.pushConstantRangeCount = 0;
 	pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
@@ -146,8 +146,8 @@ void VulkanBase::createGraphicsPipeline() {
 
 	pipelineInfo.stageCount = (uint32_t)m_GradientShader.getShaderStages().size();
 	pipelineInfo.pStages = m_GradientShader.getShaderStages().data();
-	pipelineInfo.pVertexInputState = &m_GradientShader.createVertexInputStateInfo();
-	pipelineInfo.pInputAssemblyState = &m_GradientShader.createInputAssemblyStateInfo();
+	//pipelineInfo.pVertexInputState = &m_GradientShader.createVertexInputStateInfo();
+	//pipelineInfo.pInputAssemblyState = &m_GradientShader.createInputAssemblyStateInfo();
 
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = &rasterizer;

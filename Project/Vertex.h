@@ -41,3 +41,14 @@ struct Vertex
 		return attributeDescriptions;
 	}
 };
+
+struct ViewProjection 
+{
+	glm::mat4 proj;
+	glm::mat4 view;
+};
+
+struct MeshData 
+{
+	glm::mat4 model;
+};

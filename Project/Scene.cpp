@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Vertex.h"
 #include "CommandPool.h"
+#include "Utils.h"
 
 //void Scene::AddMesh(const Mesh& mesh)
 //{
@@ -32,6 +33,7 @@ void Scene::AddRectangle(float bottom, float left, float top, float right, const
 	//{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 	//};
 
+	
 	const std::vector<Vertex> vertices = 
 	{
 		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
@@ -44,6 +46,8 @@ void Scene::AddRectangle(float bottom, float left, float top, float right, const
 		{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
 		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
 	};
+	//std::vector<uint32_t> indices{};
+	//ParseOBJ("C:/2DAE/ToolDevelopment/MinecraftTool/out/build/x64 - debug/MinecraftToolCmd/minecraftScene.obj", vertices, indices);
 
 	Mesh rect{};
 

@@ -13,9 +13,9 @@ GP2Shader::GP2Shader(const std::string& vertexShaderFile, const std::string& fra
 	: m_VertexShaderFile{ vertexShaderFile }
 	, m_FragmentShaderFile{ fragmentShaderFile }
 	, m_ShaderStages{}
-	, m_InputBinding{ Vertex::GetBindingDescription() }
-	, m_AttributeDescriptions{ Vertex::GetAttributeDescriptions() }
-	, m_DescriptorSetLayout{}
+	//, m_InputBinding{ Vertex::GetBindingDescription() }
+	//, m_AttributeDescriptions{ Vertex::GetAttributeDescriptions() }
+	//, m_DescriptorSetLayout{}
 	, m_UBOSrc{}
 {
 }
@@ -36,15 +36,20 @@ void GP2Shader::initialize(const VkPhysicalDevice& vkPhysicalDevice, const VkDev
 	);
 
 	m_UBOBuffer->Map();
-	m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->GetSizeInBytes(), 1);
+	//m_DescriptorPool = std::make_unique<DescriptorPool>(vkDevice, m_UBOBuffer->GetSizeInBytes(), 1);
+}
+
+void GP2Shader::initialize(const VulkanContext& context)
+{
+	initialize(context.physicalDevice, context.device);
 }
 
 void GP2Shader::destroy(const VkDevice& vkDevice)
 {
-	vkDestroyDescriptorSetLayout(vkDevice, m_DescriptorSetLayout, nullptr);
+	//vkDestroyDescriptorSetLayout(vkDevice, m_DescriptorSetLayout, nullptr);
 
 	m_UBOBuffer.reset();
-	m_DescriptorPool.reset();
+	//m_DescriptorPool.reset();
 }
 
 void GP2Shader::destroyShaderModules(const VkDevice& vkDevice)
@@ -81,55 +86,55 @@ VkPipelineShaderStageCreateInfo GP2Shader::createVertexShaderInfo(const VkDevice
 	return vertShaderStageInfo;
 }
 
-VkPipelineVertexInputStateCreateInfo GP2Shader::createVertexInputStateInfo()
-{
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+//VkPipelineVertexInputStateCreateInfo GP2Shader::createVertexInputStateInfo()
+//{
+//	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+//
+//	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+//	vertexInputInfo.vertexBindingDescriptionCount = 1;
+//	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(m_AttributeDescriptions.size());
+//	vertexInputInfo.pVertexBindingDescriptions = &m_InputBinding;
+//	vertexInputInfo.pVertexAttributeDescriptions = m_AttributeDescriptions.data();
+//	return vertexInputInfo;
+//}
+//
+//VkPipelineInputAssemblyStateCreateInfo GP2Shader::createInputAssemblyStateInfo()
+//{
+//	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+//	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+//	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+//	inputAssembly.primitiveRestartEnable = VK_FALSE;
+//	return inputAssembly;
+//}
 
-	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(m_AttributeDescriptions.size());
-	vertexInputInfo.pVertexBindingDescriptions = &m_InputBinding;
-	vertexInputInfo.pVertexAttributeDescriptions = m_AttributeDescriptions.data();
-	return vertexInputInfo;
-}
-
-VkPipelineInputAssemblyStateCreateInfo GP2Shader::createInputAssemblyStateInfo()
-{
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	inputAssembly.primitiveRestartEnable = VK_FALSE;
-	return inputAssembly;
-}
-
-void GP2Shader::createDescriptorSetLayout(const VkDevice& vkDevice)
-{
-	VkDescriptorSetLayoutBinding uboLayoutBinding{};
-	uboLayoutBinding.binding = 0;
-	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	uboLayoutBinding.descriptorCount = 1;
-	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-
-	VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 1;
-	layoutInfo.pBindings = &uboLayoutBinding;
-
-	if (vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor set layout!");
-	}
-}
-
-void GP2Shader::createDescriptorSets(const VkDevice& vkDevice)
-{
-	m_DescriptorPool->CreateDescriptorSets(m_DescriptorSetLayout, { m_UBOBuffer->GetVkBuffer() });
-}
-
-void GP2Shader::bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index)
-{
-	m_DescriptorPool->BindDescriptorSet(commandBuffer, pipelineLayout, index);
-}
+//void GP2Shader::createDescriptorSetLayout(const VkDevice& vkDevice)
+//{
+//	VkDescriptorSetLayoutBinding uboLayoutBinding{};
+//	uboLayoutBinding.binding = 0;
+//	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//	uboLayoutBinding.descriptorCount = 1;
+//	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+//	uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+//
+//	VkDescriptorSetLayoutCreateInfo layoutInfo{};
+//	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+//	layoutInfo.bindingCount = 1;
+//	layoutInfo.pBindings = &uboLayoutBinding;
+//
+//	if (vkCreateDescriptorSetLayout(vkDevice, &layoutInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS) {
+//		throw std::runtime_error("failed to create descriptor set layout!");
+//	}
+//}
+//
+//void GP2Shader::createDescriptorSets(const VkDevice& vkDevice)
+//{
+//	m_DescriptorPool->CreateDescriptorSets(m_DescriptorSetLayout, { m_UBOBuffer->GetVkBuffer() });
+//}
+//
+//void GP2Shader::bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index)
+//{
+//	m_DescriptorPool->BindDescriptorSet(commandBuffer, pipelineLayout, index);
+//}
 
 void GP2Shader::updateUniformBuffer(uint32_t currentImage, float aspectRatio, float fov)
 {

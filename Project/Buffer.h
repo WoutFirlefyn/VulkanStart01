@@ -19,6 +19,12 @@ public:
 		VkMemoryPropertyFlags properties,
 		VkDeviceSize size
 	);
+	Buffer(
+		VulkanContext context,
+		VkBufferUsageFlags usage,
+		VkMemoryPropertyFlags properties,
+		VkDeviceSize size
+	);
 	~Buffer()
 	{
 		DestroyBuffer();
@@ -28,31 +34,9 @@ public:
 	// Copy/move constructors and assignment operators
 	// -------------------------    
 	Buffer(const Buffer& other)						= delete;    
-	Buffer(Buffer&& other) noexcept 
-	{
-		*this = std::move(other);
-	}
+	Buffer(Buffer&& other) noexcept					= delete;
 	Buffer& operator=(const Buffer& other)			= delete;
-	Buffer& operator=(Buffer&& other) noexcept 
-	{
-		if (this != &other) {
-			// Release existing resources
-			DestroyBuffer();
-
-			// Transfer ownership
-			m_VkDevice = other.m_VkDevice;
-			m_VkDeviceSize = other.m_VkDeviceSize;
-			m_Buffer = other.m_Buffer;
-			m_BufferMemory = other.m_BufferMemory;
-
-			// Reset the source object
-			other.m_VkDevice = nullptr;
-			other.m_VkDeviceSize = 0;
-			other.m_Buffer = VK_NULL_HANDLE;
-			other.m_BufferMemory = VK_NULL_HANDLE;
-		}
-		return *this;
-	}
+	Buffer& operator=(Buffer&& other) noexcept		= delete;
 
 	//-------------------------------------------------
 	// Member functions						
