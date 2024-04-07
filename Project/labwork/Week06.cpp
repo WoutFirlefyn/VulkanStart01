@@ -1,5 +1,10 @@
 #include "vulkanbase/VulkanBase.h"
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/vec3.hpp> // glm::vec3
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
+#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
+#include <glm/ext/scalar_constants.hpp> // glm::pi
 
 void VulkanBase::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {};
@@ -50,20 +55,6 @@ void VulkanBase::drawFrame()
 
 	beginRenderPass(m_CommandBuffer, swapChainFramebuffers[imageIndex], swapChainExtent);
 
-	// 2D Camera matrix
-	ViewProjection vp{};
-	glm::vec3 scaleFactors(1 / 400.0f, 1 / 300.0f, 1.0f);
-	vp.view = glm::scale(glm::mat4(1.0f), scaleFactors);
-	vp.view = glm::translate(vp.view, glm::vec3(-1, -1, 0));
-	// draw pipeline 1.
-	//m_GraphicsPipeline2D.SetUBO(vp, 0);
-	//m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
-	// 3D camera matrix.
-	glm::vec3 cameraPos = glm::vec3(m_Radius * cosf(m_Rotation), -6, m_Radius * sinf(m_Rotation));
-	glm::vec3 targetPos = glm::vec3(0, 0, 0);
-	glm::vec3 upVector = glm::vec3(0, 1, 0);
-	//m_Rotation += 0.001f;
-
 	// Window dimensions
 	float windowWidth = swapChainExtent.width;
 	float windowHeight = swapChainExtent.height;
@@ -76,11 +67,22 @@ void VulkanBase::drawFrame()
 	float nearPlane = 0.1f;
 	float farPlane = 100.0f;
 
-	// View matrix
+	// 2D Camera matrix
+	ViewProjection vp{};
+	glm::vec3 scaleFactors(1 / 400.0f, 1 / 300.0f, 1.0f);
+	vp.view = glm::scale(glm::mat4(1.0f), scaleFactors);
+	vp.view = glm::translate(vp.view, glm::vec3(-1, -1, 0));
+	// draw pipeline 1.
+	//m_GraphicsPipeline2D.SetUBO(vp, 0);
+	m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+	// 3D camera matrix.
+	glm::vec3 cameraPos = glm::vec3(m_Radius * cosf(m_Rotation), -6, m_Radius * sinf(m_Rotation));
+	glm::vec3 targetPos = glm::vec3(0, 0, 0);
+	glm::vec3 upVector = glm::vec3(0, 1, 0);
 	vp.view = glm::lookAt(cameraPos, targetPos, upVector);
-
-	// Projection matrix
 	vp.proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+	//m_Rotation += 0.001f;
+	
 	//// draw pipeline 2.
 	m_GraphicsPipeline3D.SetUBO(vp, 0);
 	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent);

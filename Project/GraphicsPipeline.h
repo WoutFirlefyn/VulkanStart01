@@ -21,12 +21,15 @@ public:
 	void Record(const CommandBuffer& buffer, VkExtent2D extent);
 	void DrawScene(const CommandBuffer& buffer);
 	void AddMesh(std::unique_ptr<Mesh2D>&& pMesh);
+	void SetUBO(ViewProjection ubo, size_t uboIndex);
 private:
 	void CreateGraphicsPipeline(const VulkanContext& context);
+	VkPushConstantRange CreatePushConstantRange();
 
 	std::array<VkVertexInputAttributeDescription, 2> m_AttributeDescriptions;
 	VkVertexInputBindingDescription m_InputBinding;
 
+	std::unique_ptr<DescriptorPool<ViewProjection>> m_UBOPool;
 	GP2Shader m_Shader;
 	VkRenderPass m_RenderPass{};
 	VkPipelineLayout m_PipelineLayout{};

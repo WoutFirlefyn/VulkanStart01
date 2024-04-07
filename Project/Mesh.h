@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <vector>
 #include "vulkanbase/VulkanUtil.h"
 #include "Vertex.h"
@@ -70,5 +71,5 @@ private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 
 	std::vector<Vertex3D> m_vVertices{};
-	MeshData m_VertexConstant{ glm::mat4(1) };
+	MeshData m_VertexConstant{ glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)) };
 };

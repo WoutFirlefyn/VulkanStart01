@@ -11,6 +11,8 @@ void GraphicsPipeline2D::Initialize(const VulkanContext& context)
 {
 	m_RenderPass = context.renderPass;
 	m_Shader.initialize(context);
+	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, 1);
+	m_UBOPool->Initialize(context);
 	CreateGraphicsPipeline(context);
 }
 
@@ -38,6 +40,7 @@ void GraphicsPipeline2D::Cleanup(const VulkanContext& context)
 {
 	vkDestroyPipeline(context.device, m_GraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(context.device, m_PipelineLayout, nullptr);
+	m_UBOPool.reset();
 	m_Shader.destroy(context.device);
 
 	for (auto& pMesh : m_vMeshes)
@@ -74,6 +77,10 @@ void GraphicsPipeline2D::DrawScene(const CommandBuffer& buffer)
 void GraphicsPipeline2D::AddMesh(std::unique_ptr<Mesh2D>&& pMesh)
 {
 	m_vMeshes.push_back(std::move(pMesh));
+}
+
+void GraphicsPipeline2D::SetUBO(ViewProjection ubo, size_t uboIndex)
+{
 }
 
 void GraphicsPipeline2D::CreateGraphicsPipeline(const VulkanContext& context)
@@ -124,8 +131,11 @@ void GraphicsPipeline2D::CreateGraphicsPipeline(const VulkanContext& context)
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0;
-	pipelineLayoutInfo.pushConstantRangeCount = 0;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &m_UBOPool->GetDescriptorSetLayout();
+	pipelineLayoutInfo.pushConstantRangeCount = 1;
+	VkPushConstantRange pushConstantRange = CreatePushConstantRange();
+	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
 	if (vkCreatePipelineLayout(context.device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");
@@ -168,6 +178,17 @@ void GraphicsPipeline2D::CreateGraphicsPipeline(const VulkanContext& context)
 	}
 
 	m_Shader.destroyShaderModules(context.device);
+}
+
+
+VkPushConstantRange GraphicsPipeline2D::CreatePushConstantRange()
+{
+	VkPushConstantRange pushConstantRange = {};
+	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	// Stage the push constant is accessible from
+	pushConstantRange.offset = 0;
+	pushConstantRange.size = sizeof(MeshData); // Size of push constant block
+	return pushConstantRange;
 }
 
 GraphicsPipeline3D::GraphicsPipeline3D(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
