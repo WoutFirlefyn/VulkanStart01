@@ -21,7 +21,7 @@ public:
 
 	void DestroyMesh(const VkDevice& device);
 
-	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const = 0;
+	void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
 
     void AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset = 0);
 
@@ -47,7 +47,6 @@ public:
 	{
 	}
 	~Mesh2D() = default;
-	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
 	void AddVertex(const glm::vec2& pos, const glm::vec3& color);
 	void AddVertex(const Vertex2D& vertex);
 	std::vector<Vertex2D> GetVertices() const { return m_vVertices; }
@@ -64,10 +63,10 @@ public:
 	{
 	}
 	~Mesh3D() = default;
-	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
 	void AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color);
 	void AddVertex(Vertex3D vertex);
 	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
+	//static std::unique_ptr<Mesh3D>&& CreateMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 

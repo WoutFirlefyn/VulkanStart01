@@ -32,7 +32,7 @@ public:
 	void BeginRecording() const;
 	void EndRecording() const;
 
-	void FreeBuffer(const VkDevice& device, const CommandPool& commandPool);
+	void FreeBuffer(const VkDevice& device, const CommandPool& commandPool) const;
 
 	void Submit(VkSubmitInfo& info) const;
 

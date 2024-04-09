@@ -40,7 +40,8 @@ struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
 
-	bool isComplete() {
+	bool isComplete() const
+	{
 		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
@@ -88,6 +89,7 @@ private:
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
 		createDepthResources();
 		createFrameBuffers();
+
 		auto mesh2D = std::make_unique<Mesh2D>();
 		const std::vector<Vertex2D> vertices2D = 
 		{
@@ -101,17 +103,9 @@ private:
 		mesh2D->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
 		mesh2D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_GraphicsPipeline2D.AddMesh(std::move(mesh2D));
+		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 
-		auto mesh3D = std::make_unique<Mesh3D>();
-		std::vector<Vertex3D> vertices3D{};
-		std::vector<uint32_t> indices{};
-		ParseOBJ("resources/vehicle.obj", vertices3D, indices);
-		for (const auto& vertex : vertices3D)
-			mesh3D->AddVertex(vertex);
-
-		mesh3D->SetIndices(indices);
-		mesh3D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
-		m_GraphicsPipeline3D.AddMesh(std::move(mesh3D));
+		m_GraphicsPipeline3D.AddMesh("resources/vehicle.obj", context, m_CommandPool);
 
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		
@@ -156,8 +150,6 @@ private:
 		vkFreeMemory(device, depthImageMemory, nullptr);
 		//
 
-		m_Scene.Destroy(device);
-
 		vkDestroyDevice(device, nullptr);
 
 		vkDestroySurfaceKHR(instance, surface, nullptr);
@@ -188,19 +180,14 @@ private:
 
 	CommandPool m_CommandPool;
 	CommandBuffer m_CommandBuffer;
-	Scene m_Scene{};
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-
-	void drawFrame(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	
 	// Week 03
 	// Renderpass concept
 	// Graphics pipeline
 	
 	std::vector<VkFramebuffer> swapChainFramebuffers;
-	VkPipelineLayout pipelineLayout;
-	VkPipeline graphicsPipeline;
 	VkRenderPass renderPass;
 	GraphicsPipeline<Mesh2D> m_GraphicsPipeline2D{
 		"shaders/shader.vert.spv",
@@ -213,8 +200,7 @@ private:
 
 
 	void createFrameBuffers();
-	void createRenderPass(); 
-	void createGraphicsPipeline();
+	void createRenderPass();
 
 	// this shit should probably be in its own class but idc
 
@@ -277,22 +263,13 @@ private:
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	void createInstance();
 
-	void beginRenderPass(const CommandBuffer& buffer, VkFramebuffer currentBuffer, VkExtent2D extent);
+	void beginRenderPass(const CommandBuffer& buffer, VkFramebuffer currentBuffer, VkExtent2D extent) const;
 	void endRenderPass(const CommandBuffer& buffer);
 
 	void createSyncObjects();
 	void drawFrame();
 
-	////////////
-	// Camera //
-	////////////
 	Camera m_Camera;
-	//void keyEvent(int key, int scancode, int action, int mods);
-	//void mouseMove(GLFWwindow* window, double xpos, double ypos);
-	//void mouseEvent(GLFWwindow* window, int button, int action, int mods);
-	//float m_Radius{};
-	//double m_Rotation{};
-	//glm::vec2 m_DragStart{};
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;

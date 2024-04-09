@@ -30,7 +30,7 @@ void CommandBuffer::EndRecording() const
 		throw std::runtime_error("failed to record command buffer!");
 }
 
-void CommandBuffer::FreeBuffer(const VkDevice& device, const CommandPool& commandPool)
+void CommandBuffer::FreeBuffer(const VkDevice& device, const CommandPool& commandPool) const
 {
 	vkFreeCommandBuffers(device, commandPool.GetCommandPool(), 1, &m_CommandBuffer);
 }

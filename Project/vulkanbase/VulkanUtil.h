@@ -26,6 +26,7 @@ struct VulkanContext
 	VkPhysicalDevice physicalDevice;
 	VkRenderPass renderPass;
 	VkExtent2D swapChainExtent;
+	VkQueue graphicsQueue;
 };
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);

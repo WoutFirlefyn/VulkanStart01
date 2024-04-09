@@ -48,11 +48,6 @@ struct Camera
 
     void CalculateViewMatrix()
     {
-        //right = glm::normalize(glm::cross(up, forward));
-        //up = glm::normalize(glm::cross(forward, right));
-        //invViewMatrix = glm::lookAt(origin, origin + forward, up);
-        //viewMatrix = glm::inverse(invViewMatrix);
-
         glm::mat4x4 rotation = glm::rotate(glm::mat4x4(1.f), totalYaw, glm::vec3{ 0,1,0 });
         rotation = glm::rotate(rotation, totalPitch, glm::vec3{ 1,0,0 });
 
