@@ -1,9 +1,9 @@
 
-if (NOT EXISTS "C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/build/x64-Debug/_deps/glfw-build/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: \"C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/build/x64-Debug/_deps/glfw-build/install_manifest.txt\"")
+if (NOT EXISTS "C:/2DAE/Graphics Programming 2/VulkanStart01/out/build/x64-Debug/_deps/glfw-build/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: \"C:/2DAE/Graphics Programming 2/VulkanStart01/out/build/x64-Debug/_deps/glfw-build/install_manifest.txt\"")
 endif()
 
-file(READ "C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/build/x64-Debug/_deps/glfw-build/install_manifest.txt" files)
+file(READ "C:/2DAE/Graphics Programming 2/VulkanStart01/out/build/x64-Debug/_deps/glfw-build/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})

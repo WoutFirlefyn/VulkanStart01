@@ -101,8 +101,9 @@ private:
 		mesh2D->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
 		mesh2D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_GraphicsPipeline2D.AddMesh(std::move(mesh2D));
+
 		auto mesh3D = std::make_unique<Mesh3D>();
-		std::vector<Vertex3D> vertices3D {};
+		std::vector<Vertex3D> vertices3D{};
 		std::vector<uint32_t> indices{};
 		ParseOBJ("resources/vehicle.obj", vertices3D, indices);
 		for (const auto& vertex : vertices3D)
@@ -132,7 +133,6 @@ private:
 		vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
 		vkDestroyFence(device, inFlightFence, nullptr);
 
-		m_GradientShader.destroy(device);
 		m_CommandPool.Destroy();
 		for (auto framebuffer : swapChainFramebuffers)
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
@@ -173,11 +173,6 @@ private:
 		}
 	}
 
-	GP2Shader m_GradientShader{
-		"shaders/shader.vert.spv",
-		"shaders/shader.frag.spv"
-	};
-
 	// Week 01: 
 	// Actual window
 	// simple fragment + vertex shader creation functions
@@ -207,11 +202,11 @@ private:
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
 	VkRenderPass renderPass;
-	GraphicsPipeline2D m_GraphicsPipeline2D{
+	GraphicsPipeline<Mesh2D> m_GraphicsPipeline2D{
 		"shaders/shader.vert.spv",
 		"shaders/shader.frag.spv"
 	};
-	GraphicsPipeline3D m_GraphicsPipeline3D{
+	GraphicsPipeline<Mesh3D> m_GraphicsPipeline3D{
 		"shaders/objshader.vert.spv",
 		"shaders/objshader.frag.spv"
 	};

@@ -13,20 +13,9 @@ public:
 
 	~GP2Shader();
 
-	void initialize(const VkPhysicalDevice& vkPhysicalDevice, const VkDevice& vkDevice);
 	void initialize(const VulkanContext& context);
-	void destroy(const VkDevice& vkDevice);
 	void destroyShaderModules(const VkDevice& vkDevice);
-	//VkPipelineVertexInputStateCreateInfo createVertexInputStateInfo();
-	//VkPipelineInputAssemblyStateCreateInfo createInputAssemblyStateInfo();
 	std::vector<VkPipelineShaderStageCreateInfo>& getShaderStages() { return m_ShaderStages; }
-
-	// UBO binding
-	//void createDescriptorSetLayout(const VkDevice& vkDevice);
-	//void createDescriptorSets(const VkDevice& vkDevice);
-	//const VkDescriptorSetLayout& getDescriptorSetLayout() const{ return m_DescriptorSetLayout; }
-	//void bindDescriptorSetLayout(VkCommandBuffer commandBuffer, VkPipelineLayout pipelineLayout, size_t index);
-	void updateUniformBuffer(uint32_t currentImage, float aspectRatio, float fov);
 private:
 	VkPipelineShaderStageCreateInfo createFragmentShaderInfo(const VkDevice& vkDevice);
 	VkPipelineShaderStageCreateInfo createVertexShaderInfo(const VkDevice& vkDevice);
@@ -36,14 +25,6 @@ private:
 	std::string m_FragmentShaderFile;
 
 	std::vector<VkPipelineShaderStageCreateInfo> m_ShaderStages;
-
-	//std::array<VkVertexInputAttributeDescription, 2> m_AttributeDescriptions;
-	//VkVertexInputBindingDescription m_InputBinding;
-
-	//VkDescriptorSetLayout m_DescriptorSetLayout;
-	std::unique_ptr<Buffer> m_UBOBuffer;
-	VertexUBO m_UBOSrc;
-	//std::unique_ptr<DescriptorPool> m_DescriptorPool;
 
 	GP2Shader(const GP2Shader&) = delete;
 	GP2Shader& operator= (const GP2Shader&) = delete;

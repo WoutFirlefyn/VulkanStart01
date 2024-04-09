@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include "CommandBuffer.h"
+#include "Utils.h"
 
 
 void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue)
@@ -22,20 +23,6 @@ void Mesh::SetIndices(const std::vector<uint32_t>& vIndices)
 {
 	m_vIndices = vIndices;
 }
-
-//uint32_t Mesh::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const
-//{
-//	VkPhysicalDeviceMemoryProperties memProperties;
-//	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
-//
-//	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) 
-//	{
-//		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
-//			return i;
-//	}
-//
-//	throw std::runtime_error("failed to find suitable memory type!");
-//}
 
 void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
@@ -86,6 +73,15 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 m_VertexBuffer->BindAsVertexBuffer(vkCommandBuffer);
 	 m_IndexBuffer->BindAsIndexBuffer(vkCommandBuffer);
 
+	 vkCmdPushConstants(
+		 vkCommandBuffer,
+		 pipelineLayout,
+		 VK_SHADER_STAGE_VERTEX_BIT, // Stage flag should match the push constant range in the layout
+		 0, // Offset within the push constant block
+		 sizeof(MeshData), // Size of the push constants to update
+		 &m_VertexConstant // Pointer to the data
+	 );
+	 
 	 vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
  }
 
@@ -134,16 +130,16 @@ void Mesh3D::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkComm
 	vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
 }
 
- void Mesh3D::AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color)
- {
-	 m_vVertices.push_back(Vertex3D{ pos, normal, color });
- }
+void Mesh3D::AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color)
+{
+	m_vVertices.push_back(Vertex3D{ pos, normal, color });
+}
 
- void Mesh3D::AddVertex(Vertex3D vertex)
- {
-	 vertex.color = { 1,1,1 };
-	 m_vVertices.push_back(vertex);
- }
+void Mesh3D::AddVertex(Vertex3D vertex)
+{
+	vertex.color = { 1,1,1 };
+	m_vVertices.push_back(vertex);
+}
 
 void Mesh3D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {

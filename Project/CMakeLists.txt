@@ -52,7 +52,7 @@ set(SOURCES
     "DescriptorPool.cpp"
     "Utils.h"
     "GraphicsPipeline.h" 
-    "GraphicsPipeline.cpp" 
+     
     "UniformBufferObject.h"
     "Camera.h"
 )

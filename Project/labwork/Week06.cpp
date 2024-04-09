@@ -56,37 +56,15 @@ void VulkanBase::drawFrame()
 
 	beginRenderPass(m_CommandBuffer, swapChainFramebuffers[imageIndex], swapChainExtent);
 
-	// Window dimensions
-	float windowWidth = swapChainExtent.width;
-	float windowHeight = swapChainExtent.height;
-	float aspectRatio = windowWidth / windowHeight;
-
-	// Field of View
-	float fov = 45.0f; // In degrees
-
-	// Near and Far planes
-	float nearPlane = 0.1f;
-	float farPlane = 100.0f;
-
 	// 2D Camera matrix
 	ViewProjection vp{};
-
-	glm::vec3 scaleFactors(1 / 400.0f, 1 / 300.0f, 1.0f);
+	glm::vec3 scaleFactors(1.0f / m_Camera.aspectRatio, 1.0f, 1.0f);
 	vp.view = glm::scale(glm::mat4(1.0f), scaleFactors);
-	vp.view = glm::translate(vp.view, glm::vec3(-1, -1, 0));
-	// 
+
 	// draw pipeline 1.
 	m_GraphicsPipeline2D.SetUBO(vp, 0);
-	//m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+	m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
 	// 3D camera matrix.
-	static auto startTime = std::chrono::high_resolution_clock::now();
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-	//vp.view = glm::lookAt(glm::vec3(.0f, 2.0f, 9.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-	//vp.proj = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 10.0f);
-	//vp.proj[1][1] *= -1;
 	m_Camera.Update();
 	vp.view = m_Camera.viewMatrix;
 	vp.proj = m_Camera.projectionMatrix;
@@ -98,12 +76,7 @@ void VulkanBase::drawFrame()
 	// end the render pass
 	endRenderPass(m_CommandBuffer);
 
-
-	//m_GradientShader.bindDescriptorSetLayout(m_CommandBuffer.GetVkCommandBuffer(), pipelineLayout, 0);
-	//drawFrame(m_CommandBuffer.GetVkCommandBuffer(), imageIndex);
 	m_CommandBuffer.EndRecording();
-
-	//m_GradientShader.updateUniformBuffer(imageIndex, swapChainExtent.width / (float)swapChainExtent.height, 45.f);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

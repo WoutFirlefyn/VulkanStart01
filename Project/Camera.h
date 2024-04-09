@@ -112,7 +112,6 @@ struct Camera
     {
         if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
         {
-            std::cout << "right mouse button pressed\n";
             double xpos, ypos;
             glfwGetCursorPos(window, &xpos, &ypos);
             dragStart.x = static_cast<float>(xpos);

@@ -33,6 +33,7 @@ protected:
 	std::unique_ptr<Buffer> m_VertexBuffer;
 	std::unique_ptr<Buffer> m_IndexBuffer;
 	std::vector<uint32_t> m_vIndices{};
+	MeshData m_VertexConstant{ glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)) };
 
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;
@@ -71,5 +72,4 @@ private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 
 	std::vector<Vertex3D> m_vVertices{};
-	MeshData m_VertexConstant{ glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)) };
 };
