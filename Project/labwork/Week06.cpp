@@ -74,7 +74,7 @@ void VulkanBase::drawFrame()
 	vp.view = glm::translate(vp.view, glm::vec3(-1, -1, 0));
 	// draw pipeline 1.
 	//m_GraphicsPipeline2D.SetUBO(vp, 0);
-	m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+	//m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
 	// 3D camera matrix.
 	glm::vec3 cameraPos = glm::vec3(m_Radius * cosf(m_Rotation), -6, m_Radius * sinf(m_Rotation));
 	glm::vec3 targetPos = glm::vec3(0, 0, 0);

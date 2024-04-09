@@ -6,7 +6,7 @@
 #include "vulkanbase/VulkanUtil.h"
 
 //-----------------------------------------------------
-// CommandBuffer Class									
+// CommandBuffer Class									 
 //-----------------------------------------------------
 class CommandPool;
 class CommandBuffer final

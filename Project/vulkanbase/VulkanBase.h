@@ -116,7 +116,7 @@ private:
 			//{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
 		};
 		std::vector<uint32_t> indices{};
-		ParseOBJ("resources/vehicle.obj", vertices3D, indices);
+		ParseOBJ("resources/lowpoly_bunny2.obj", vertices3D, indices);
 		for (const auto& vertex : vertices3D)
 			mesh3D->AddVertex(vertex);
 

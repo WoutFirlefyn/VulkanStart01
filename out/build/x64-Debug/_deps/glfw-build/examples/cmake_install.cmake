@@ -1,8 +1,8 @@
-# Install script for directory: C:/2DAE/Graphics Programming 2/VulkanStart01/out/build/x64-Debug/_deps/glfw-src/examples
+# Install script for directory: C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/build/x64-Debug/_deps/glfw-src/examples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/2DAE/Graphics Programming 2/VulkanStart01/out/install/x64-Debug")
+  set(CMAKE_INSTALL_PREFIX "C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

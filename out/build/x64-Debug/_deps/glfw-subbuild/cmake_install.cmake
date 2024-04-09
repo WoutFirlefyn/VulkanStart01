@@ -1,4 +1,4 @@
-# Install script for directory: C:/2DAE/Graphics Programming 2/VulkanStart01/out/build/x64-Debug/_deps/glfw-subbuild
+# Install script for directory: C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/build/x64-Debug/_deps/glfw-subbuild
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/2DAE/Graphics Programming 2/VulkanStart01/out/build/x64-Debug/_deps/glfw-subbuild/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/build/x64-Debug/_deps/glfw-subbuild/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
