@@ -70,6 +70,7 @@ void GraphicsPipeline2D::Record(const CommandBuffer& buffer, VkExtent2D extent)
 
 void GraphicsPipeline2D::DrawScene(const CommandBuffer& buffer)
 {
+	m_UBOPool->BindDescriptorSet(buffer.GetVkCommandBuffer(), m_PipelineLayout, 0);
 	for (auto& mesh : m_vMeshes)
 		mesh->Draw(m_PipelineLayout, buffer.GetVkCommandBuffer());
 }
@@ -81,6 +82,7 @@ void GraphicsPipeline2D::AddMesh(std::unique_ptr<Mesh2D>&& pMesh)
 
 void GraphicsPipeline2D::SetUBO(ViewProjection ubo, size_t uboIndex)
 {
+	m_UBOPool->SetUBO(ubo, uboIndex);
 }
 
 void GraphicsPipeline2D::CreateGraphicsPipeline(const VulkanContext& context)
@@ -96,7 +98,7 @@ void GraphicsPipeline2D::CreateGraphicsPipeline(const VulkanContext& context)
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
-	rasterizer.cullMode = VK_CULL_MODE_NONE;
+	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
 	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -289,7 +291,7 @@ void GraphicsPipeline3D::CreateGraphicsPipeline(const VulkanContext& context)
 	rasterizer.rasterizerDiscardEnable = VK_FALSE;
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
-	rasterizer.cullMode = VK_CULL_MODE_NONE;
+	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
 	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 

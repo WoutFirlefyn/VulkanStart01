@@ -139,8 +139,9 @@ void Mesh3D::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkComm
 	 m_vVertices.push_back(Vertex3D{ pos, normal, color });
  }
 
- void Mesh3D::AddVertex(const Vertex3D& vertex)
+ void Mesh3D::AddVertex(Vertex3D vertex)
  {
+	 vertex.color = { 1,1,1 };
 	 m_vVertices.push_back(vertex);
  }
 

@@ -65,7 +65,7 @@ public:
 	~Mesh3D() = default;
 	virtual void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
 	void AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color);
-	void AddVertex(const Vertex3D& vertex);
+	void AddVertex(Vertex3D vertex);
 	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;

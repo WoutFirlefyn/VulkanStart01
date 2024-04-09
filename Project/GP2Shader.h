@@ -5,7 +5,6 @@
 #include "Vertex.h"
 #include "Buffer.h"
 #include "DescriptorPool.h"
-//class DescriptorPool;
 struct Vertex;
 class GP2Shader final
 {

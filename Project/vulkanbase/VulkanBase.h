@@ -26,7 +26,7 @@
 #include "Scene.h"
 #include "GraphicsPipeline.h"
 #include "Utils.h"
-
+#include "Camera.h"
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -77,13 +77,12 @@ private:
 		createImageViews();
 		
 		// week 03
-		//m_GradientShader.initialize(physicalDevice, device);
 		createRenderPass();
 		
+		m_Camera.Initialize(60.f, glm::vec3(0, 2, -15), static_cast<float>(swapChainExtent.width) / swapChainExtent.height);
+
 		m_GraphicsPipeline2D.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
 		m_GraphicsPipeline3D.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
-		//m_GradientShader.createDescriptorSetLayout(device);
-		//createGraphicsPipeline();
 
 		// week 02
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
@@ -103,29 +102,16 @@ private:
 		mesh2D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_GraphicsPipeline2D.AddMesh(std::move(mesh2D));
 		auto mesh3D = std::make_unique<Mesh3D>();
-		/*const */std::vector<Vertex3D> vertices3D = 
-		{
-			//{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-			//{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-			//{{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-			//{{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-
-			//{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			//{{ 0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-			//{{ 0.5f,  0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
-			//{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}}
-		};
+		std::vector<Vertex3D> vertices3D {};
 		std::vector<uint32_t> indices{};
 		ParseOBJ("resources/vehicle.obj", vertices3D, indices);
 		for (const auto& vertex : vertices3D)
 			mesh3D->AddVertex(vertex);
 
-		//mesh3D->SetIndices(std::vector<uint32_t> { 0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 });
 		mesh3D->SetIndices(indices);
 		mesh3D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
 		m_GraphicsPipeline3D.AddMesh(std::move(mesh3D));
-		//m_Scene.AddRectangle(0.5f, -0.5f, -0.5f, 0.5f, physicalDevice, device, m_CommandPool, graphicsQueue);
-		//m_GradientShader.createDescriptorSets(device);
+
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		
 		// week 06
@@ -305,12 +291,13 @@ private:
 	////////////
 	// Camera //
 	////////////
-	void keyEvent(int key, int scancode, int action, int mods);
-	void mouseMove(GLFWwindow* window, double xpos, double ypos);
-	void mouseEvent(GLFWwindow* window, int button, int action, int mods);
-	float m_Radius{};
-	double m_Rotation{};
-	glm::vec2 m_DragStart{};
+	Camera m_Camera;
+	//void keyEvent(int key, int scancode, int action, int mods);
+	//void mouseMove(GLFWwindow* window, double xpos, double ypos);
+	//void mouseEvent(GLFWwindow* window, int button, int action, int mods);
+	//float m_Radius{};
+	//double m_Rotation{};
+	//glm::vec2 m_DragStart{};
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;

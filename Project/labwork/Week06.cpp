@@ -5,6 +5,7 @@
 #include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
 #include <glm/ext/matrix_clip_space.hpp> // glm::perspective
 #include <glm/ext/scalar_constants.hpp> // glm::pi
+#include <chrono>
 
 void VulkanBase::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {};
@@ -69,18 +70,26 @@ void VulkanBase::drawFrame()
 
 	// 2D Camera matrix
 	ViewProjection vp{};
+
 	glm::vec3 scaleFactors(1 / 400.0f, 1 / 300.0f, 1.0f);
 	vp.view = glm::scale(glm::mat4(1.0f), scaleFactors);
 	vp.view = glm::translate(vp.view, glm::vec3(-1, -1, 0));
+	// 
 	// draw pipeline 1.
-	//m_GraphicsPipeline2D.SetUBO(vp, 0);
-	m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+	m_GraphicsPipeline2D.SetUBO(vp, 0);
+	//m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
 	// 3D camera matrix.
-	glm::vec3 cameraPos = glm::vec3(m_Radius * cosf(m_Rotation), -6, m_Radius * sinf(m_Rotation));
-	glm::vec3 targetPos = glm::vec3(0, 0, 0);
-	glm::vec3 upVector = glm::vec3(0, 1, 0);
-	vp.view = glm::lookAt(cameraPos, targetPos, upVector);
-	vp.proj = glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+	//vp.view = glm::lookAt(glm::vec3(.0f, 2.0f, 9.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	//vp.proj = glm::perspective(glm::radians(fov), aspectRatio, 0.1f, 10.0f);
+	//vp.proj[1][1] *= -1;
+	m_Camera.Update();
+	vp.view = m_Camera.viewMatrix;
+	vp.proj = m_Camera.projectionMatrix;
 	//m_Rotation += 0.001f;
 	
 	//// draw pipeline 2.

@@ -54,6 +54,7 @@ set(SOURCES
     "GraphicsPipeline.h" 
     "GraphicsPipeline.cpp" 
     "UniformBufferObject.h"
+    "Camera.h"
 )
 
 
