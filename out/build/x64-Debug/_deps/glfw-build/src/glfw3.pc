@@ -1,7 +1,7 @@
-prefix=C:/2DAE/Graphics Programming 2/VulkanStart01/out/install/x64-Debug
+prefix=C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/install/x64-Debug
 exec_prefix=${prefix}
-includedir=C:/2DAE/Graphics Programming 2/VulkanStart01/out/install/x64-Debug/include
-libdir=C:/2DAE/Graphics Programming 2/VulkanStart01/out/install/x64-Debug/lib
+includedir=C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/install/x64-Debug/include
+libdir=C:/Users/Mama/OneDrive/Documenten/GitHub/VulkanStart01/out/install/x64-Debug/lib
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input
