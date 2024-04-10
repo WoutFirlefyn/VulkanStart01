@@ -50,7 +50,7 @@ struct Camera
     {
         glm::mat4x4 rotation = glm::rotate(glm::mat4x4(1.f), totalYaw, glm::vec3{ 0,1,0 });
         rotation = glm::rotate(rotation, totalPitch, glm::vec3{ 1,0,0 });
-
+        
         forward = glm::normalize(rotation[2]);
         right = glm::normalize(glm::cross(up, forward));
 
@@ -87,6 +87,7 @@ struct Camera
             origin -= right;
         }
     }
+
     void MouseMove(GLFWwindow* window, double xpos, double ypos)
     {
         int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
@@ -103,6 +104,7 @@ struct Camera
             dragStart = glm::vec2(xpos, ypos);
         }
     }
+
     void MouseEvent(GLFWwindow* window, int button, int action, int mods)
     {
         if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)

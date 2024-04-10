@@ -60,17 +60,16 @@ void VulkanBase::drawFrame()
 	ViewProjection vp{};
 	glm::vec3 scaleFactors(1.0f / m_Camera.aspectRatio, 1.0f, 1.0f);
 	vp.view = glm::scale(glm::mat4(1.0f), scaleFactors);
-
 	// draw pipeline 1.
 	m_GraphicsPipeline2D.SetUBO(vp, 0);
 	m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+
 	// 3D camera matrix.
 	m_Camera.Update();
 	vp.view = m_Camera.viewMatrix;
 	vp.proj = m_Camera.projectionMatrix;
 	//m_Rotation += 0.001f;
-	
-	//// draw pipeline 2.
+	// draw pipeline 2.
 	m_GraphicsPipeline3D.SetUBO(vp, 0);
 	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent);
 	// end the render pass

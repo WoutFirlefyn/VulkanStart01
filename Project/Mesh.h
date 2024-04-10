@@ -27,13 +27,15 @@ public:
 
 	void SetIndices(const std::vector<uint32_t>& vIndices);
 
+	void SetVertexConstant(const MeshData& vertexConstant) { m_VertexConstant = vertexConstant; }
+
 	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue);
 protected:
 	Mesh() = default;
 	std::unique_ptr<Buffer> m_VertexBuffer;
 	std::unique_ptr<Buffer> m_IndexBuffer;
 	std::vector<uint32_t> m_vIndices{};
-	MeshData m_VertexConstant{ glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)) };
+	MeshData m_VertexConstant{ glm::mat4(1) };
 
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;
@@ -66,7 +68,6 @@ public:
 	void AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color);
 	void AddVertex(Vertex3D vertex);
 	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
-	//static std::unique_ptr<Mesh3D>&& CreateMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 

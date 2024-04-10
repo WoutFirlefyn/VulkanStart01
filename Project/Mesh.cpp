@@ -125,21 +125,6 @@ void Mesh3D::AddVertex(Vertex3D vertex)
 	m_vVertices.push_back(vertex);
 }
 
-//std::unique_ptr<Mesh3D>&& Mesh3D::CreateMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool)
-//{"resources/vehicle.obj"
-//	auto mesh = std::make_unique<Mesh3D>();
-//	std::vector<Vertex3D> vertices{};
-//	std::vector<uint32_t> indices{};
-//	ParseOBJ(fileName, vertices, indices);
-//	for (const auto& vertex : vertices)
-//		mesh->AddVertex(vertex);
-//
-//	mesh->SetIndices(indices);
-//	mesh->Initialize(context.physicalDevice, context.device, commandPool, context.graphicsQueue);
-//
-//	return std::move(mesh);
-//}
-
 void Mesh3D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
 	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();

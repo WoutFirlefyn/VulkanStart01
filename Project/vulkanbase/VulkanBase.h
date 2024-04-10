@@ -23,7 +23,6 @@
 #include "CommandBuffer.h"
 #include "Vertex.h"
 #include "Mesh.h"
-#include "Scene.h"
 #include "GraphicsPipeline.h"
 #include "Utils.h"
 #include "Camera.h"
@@ -94,9 +93,9 @@ private:
 		const std::vector<Vertex2D> vertices2D = 
 		{
 			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+			{{0.5f , -0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f ,  0.5f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}} 
 		};
 		for (const auto& vertex : vertices2D)
 			mesh2D->AddVertex(vertex);
@@ -105,7 +104,10 @@ private:
 		m_GraphicsPipeline2D.AddMesh(std::move(mesh2D));
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 
-		m_GraphicsPipeline3D.AddMesh("resources/vehicle.obj", context, m_CommandPool);
+		glm::vec3 offset{ 12, 0, 0 };
+		
+		m_GraphicsPipeline3D.AddMesh("resources/vehicle.obj", context, m_CommandPool, MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), offset), glm::vec3(0.6f)) });
+		m_GraphicsPipeline3D.AddMesh("resources/tuktuk.obj", context, m_CommandPool, MeshData{ glm::translate(glm::mat4(1.0f), -offset) });
 
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		
