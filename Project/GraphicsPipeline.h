@@ -26,7 +26,8 @@ public:
 	void Record(const CommandBuffer& buffer, VkExtent2D extent);
 	void DrawScene(const CommandBuffer& buffer);
 	void AddMesh(std::unique_ptr<Mesh>&& pMesh);
-	void SetUBO(ViewProjection ubo, size_t uboIndex);
+	void SetUBO(const ViewProjection& ubo, size_t uboIndex);
+	void SetVertexConstant(const MeshData& vertexConstant);
 private:
 	void CreateGraphicsPipeline(const VulkanContext& context);
 	VkPushConstantRange CreatePushConstantRange();
@@ -134,9 +135,16 @@ inline void GraphicsPipeline<Mesh>::AddMesh(std::unique_ptr<Mesh>&& pMesh)
 }
 
 template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::SetUBO(ViewProjection ubo, size_t uboIndex)
+inline void GraphicsPipeline<Mesh>::SetUBO(const ViewProjection& ubo, size_t uboIndex)
 {
 	m_UBOPool->SetUBO(ubo, uboIndex);
+}
+
+template<typename Mesh>
+inline void GraphicsPipeline<Mesh>::SetVertexConstant(const MeshData& vertexConstant)
+{
+	for (auto& mesh : m_vMeshes)
+		mesh->SetVertexConstant({ mesh->GetVertexConstant().model * vertexConstant.model });
 }
 
 template<typename Mesh>

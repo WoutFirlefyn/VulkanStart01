@@ -27,6 +27,7 @@ public:
 	void SetIndices(const std::vector<uint32_t>& vIndices);
 
 	void SetVertexConstant(const MeshData& vertexConstant) { m_VertexConstant = vertexConstant; }
+	const MeshData& GetVertexConstant() const { return m_VertexConstant; }
 
 	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue);
 protected:

@@ -70,9 +70,15 @@ void VulkanBase::drawFrame()
 	m_Camera.Update();
 	vp.view = m_Camera.viewMatrix;
 	vp.proj = m_Camera.projectionMatrix;
-	//m_Rotation += 0.001f;
 	// draw pipeline 2.
+
+	static auto startTime{ std::chrono::steady_clock::now() };
+	auto endTime = std::chrono::steady_clock::now();
+	auto deltaTime = std::chrono::duration<float>(endTime - startTime).count();
+	startTime = endTime;
+	float rotationAngle = 90.f * deltaTime;
 	m_GraphicsPipeline3D.SetUBO(vp, 0);
+	m_GraphicsPipeline3D.SetVertexConstant({ glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3{ 0.f,1.f,0.f }) });
 	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent);
 	// end the render pass
 	endRenderPass(m_CommandBuffer);

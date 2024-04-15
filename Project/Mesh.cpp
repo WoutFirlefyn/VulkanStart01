@@ -131,18 +131,18 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 std::vector<uint32_t> vIndices{};
 
 	 oval->AddVertex(centerVertex);
-	 for (int i = 1; i <= numberOfSegments; i++)
+	 for (int i{}; i < numberOfSegments; i++)
 	 {
 		 currEdgeVertex.pos = center + radius * glm::vec2(glm::cos(radians * i), glm::sin(radians * i));
 
 		 oval->AddVertex(currEdgeVertex);
 
 		 vIndices.push_back(0);
-		 vIndices.push_back(i);
-		 if (i == numberOfSegments) 
+		 vIndices.push_back(i + 1);
+		 if (i == numberOfSegments - 1) 
 			 vIndices.push_back(1);
 		 else 
-			 vIndices.push_back(i + 1);
+			 vIndices.push_back(i + 2);
 	 }
 
 	 oval->SetIndices(vIndices);

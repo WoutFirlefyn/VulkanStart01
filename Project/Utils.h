@@ -10,13 +10,6 @@
 #pragma warning(disable : 4505) //Warning unreferenced local function
 static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true)
 {
-#ifdef DISABLE_OBJ
-
-	//TODO: Enable the code below after uncommenting all the vertex attributes of DataTypes::Vertex
-	// >> Comment/Remove '#define DISABLE_OBJ'
-	assert(false && "OBJ PARSER not enabled! Check the comments in Utils::ParseOBJ");
-
-#else
 	std::ifstream file(filename);
 
 	if (!file.is_open())
@@ -71,11 +64,11 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertice
 			//if a face is read:
 			//construct the 3 vertices, add them to the vertex array
 			//add three indices to the index array
-			//add the material index as attibute to the attribute array
+			//add the material index as attibute sto the attribute array
 			//
 			// Faces or triangles
 			Vertex3D vertex{};
-			size_t iPosition, iNormal , iTexCoord;
+			size_t iPosition, iNormal, iTexCoord;
 
 			uint32_t tempIndices[3]{};
 			for (size_t iFace = 0; iFace < 3; iFace++)
@@ -107,7 +100,6 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertice
 
 				vertices.push_back(vertex);
 				tempIndices[iFace] = uint32_t(vertices.size()) - 1;
-				//indices.push_back(uint32_t(vertices.size()) - 1);
 			}
 
 			indices.push_back(tempIndices[0]);
@@ -168,5 +160,4 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertice
 
 	return true;
 }
-#endif
 #pragma warning(pop)
