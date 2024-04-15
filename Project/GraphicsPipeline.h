@@ -7,6 +7,7 @@
 #include "GP2Shader.h"
 #include "CommandBuffer.h"
 #include "Mesh.h"
+#include "Mesh.h"
 
 template <typename Mesh>
 class GraphicsPipeline
@@ -24,7 +25,6 @@ public:
 	void Cleanup(const VulkanContext& context);
 	void Record(const CommandBuffer& buffer, VkExtent2D extent);
 	void DrawScene(const CommandBuffer& buffer);
-	void AddMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant = MeshData{ glm::mat4(1) });
 	void AddMesh(std::unique_ptr<Mesh>&& pMesh);
 	void SetUBO(ViewProjection ubo, size_t uboIndex);
 private:
@@ -128,26 +128,6 @@ inline void GraphicsPipeline<Mesh>::DrawScene(const CommandBuffer& buffer)
 }
 
 template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::AddMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant)
-{
-	if (std::is_same<Mesh, Mesh2D>())
-		return;
-
-	auto mesh = std::make_unique<Mesh3D>();
-	std::vector<Vertex3D> vertices{};
-	std::vector<uint32_t> indices{};
-	ParseOBJ(fileName, vertices, indices);
-	for (const auto& vertex : vertices)
-		mesh->AddVertex(vertex);
-
-	mesh->SetIndices(indices);
-	mesh->SetVertexConstant(vertexConstant);
-	mesh->Initialize(context.physicalDevice, context.device, commandPool, context.graphicsQueue);
-
-	m_vMeshes.push_back(std::move(mesh));
-}
-
-template<typename Mesh>
 inline void GraphicsPipeline<Mesh>::AddMesh(std::unique_ptr<Mesh>&& pMesh)
 {
 	m_vMeshes.push_back(std::move(pMesh));
@@ -236,8 +216,11 @@ inline void GraphicsPipeline<Mesh>::CreateGraphicsPipeline(const VulkanContext& 
 
 	pipelineInfo.stageCount = (uint32_t)m_Shader.getShaderStages().size();
 	pipelineInfo.pStages = m_Shader.getShaderStages().data();
-	pipelineInfo.pVertexInputState = &CreateVertexInputStateInfo();
-	pipelineInfo.pInputAssemblyState = &CreateInputAssemblyStateInfo();
+
+	auto vertexInputStateInfo = CreateVertexInputStateInfo();
+	auto inputAssemblyStateInfo = CreateInputAssemblyStateInfo();
+	pipelineInfo.pVertexInputState = &vertexInputStateInfo;
+	pipelineInfo.pInputAssemblyState = &inputAssemblyStateInfo;
 
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = &rasterizer;

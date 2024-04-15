@@ -24,8 +24,6 @@ public:
 
 	void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
 
-    void AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset = 0);
-
 	void SetIndices(const std::vector<uint32_t>& vIndices);
 
 	void SetVertexConstant(const MeshData& vertexConstant) { m_VertexConstant = vertexConstant; }
@@ -55,7 +53,7 @@ public:
 	std::vector<Vertex2D> GetVertices() const { return m_vVertices; }
 
 	static std::unique_ptr<Mesh2D> CreateRectangle(const VulkanContext& context, const CommandPool& commandPool, int top, int left, int bottom, int right);
-	static std::unique_ptr<Mesh2D> CreateOval(const VulkanContext& context, float centerX, float centerY, float radiusX, float radiusY, int numberOfSegments);
+	static std::unique_ptr<Mesh2D> CreateOval(const VulkanContext& context, const CommandPool& commandPool, glm::vec2 center, glm::vec2 radius, int numberOfSegments);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 
@@ -72,6 +70,8 @@ public:
 	void AddVertex(const glm::vec3& pos, const glm::vec3& normal, const glm::vec3& color);
 	void AddVertex(Vertex3D vertex);
 	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
+
+	static std::unique_ptr<Mesh3D> CreateMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant = MeshData{ glm::mat4(1) });
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 

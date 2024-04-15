@@ -91,11 +91,12 @@ private:
 
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
 
 		glm::vec3 offset{ 12, 0, 0 };
 		
-		m_GraphicsPipeline3D.AddMesh("resources/vehicle.obj", context, m_CommandPool, MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), offset), glm::vec3(0.6f)) });
-		m_GraphicsPipeline3D.AddMesh("resources/tuktuk.obj", context, m_CommandPool, MeshData{ glm::translate(glm::mat4(1.0f), -offset) });
+		m_GraphicsPipeline3D.AddMesh(std::move(Mesh3D::CreateMesh("resources/vehicle.obj", context, m_CommandPool, MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), offset), glm::vec3(0.5f)) })));
+		m_GraphicsPipeline3D.AddMesh(std::move(Mesh3D::CreateMesh("resources/tuktuk.obj", context, m_CommandPool, MeshData{ glm::rotate(glm::translate(glm::mat4(1.0f), -offset), glm::radians(-90.f), glm::vec3{0.f,1.f,0.f}) })));
 
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		

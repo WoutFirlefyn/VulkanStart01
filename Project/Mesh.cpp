@@ -1,7 +1,7 @@
 #include "Mesh.h"
 #include "CommandBuffer.h"
 #include "Utils.h"
-#include "numbers"
+#include <numbers>
 
 
 void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue)
@@ -36,10 +36,6 @@ void Mesh::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkComman
 	);
 
 	vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
-}
-
-void Mesh::AddTriangle(uint32_t i1, uint32_t i2, uint32_t i3, uint32_t offset)
-{
 }
 
 void Mesh::SetIndices(const std::vector<uint32_t>& vIndices)
@@ -122,35 +118,37 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 return rect;
  }
 
- std::unique_ptr<Mesh2D> Mesh2D::CreateOval(const VulkanContext& context, float centerX, float centerY, float radiusX, float radiusY, int numberOfSegments)
+ std::unique_ptr<Mesh2D> Mesh2D::CreateOval(const VulkanContext& context, const CommandPool& commandPool, glm::vec2 center, glm::vec2 radius, int numberOfSegments)
  {
-	 //assert((radiusX > 0 && radiusY > 0));
-	 //constexpr float pi = 3.14159265359f;
+	 const float pi = static_cast<float>(std::numbers::pi);
+	 const float radians = pi * 2 / numberOfSegments;
 
-	 //float radians = pi * 2 / numberOfSegments;
+	 auto oval = std::make_unique<Mesh2D>();
 
-	 //auto oval = std::make_unique<Mesh2D>();
+	 Vertex2D centerVertex{ center, glm::vec3{1.0f,0.0f,0.0f} };
+	 Vertex2D currEdgeVertex{ {}, glm::vec3{0.0f,0.0f,1.0f} };
 
-	 //Vertex2D center{ glm::vec2{centerX, centerY}, glm::vec3{0.0f,0.0f,1.0f} };
-	 //Vertex2D currEdgeVertex{ {}, glm::vec3{0.0f,1.0f,0.0f} };
+	 std::vector<uint32_t> vIndices{};
 
-	 //oval->AddVertex(center);
-	 //for (int i = 1; i <= numberOfSegments; i++)
-	 //{
-		// currEdgeVertex.pos.x = centerX + radiusX * glm::cos(radians * i);
-		// currEdgeVertex.pos.y = centerY + radiusY * glm::sin(radians * i);
+	 oval->AddVertex(centerVertex);
+	 for (int i = 1; i <= numberOfSegments; i++)
+	 {
+		 currEdgeVertex.pos = center + radius * glm::vec2(glm::cos(radians * i), glm::sin(radians * i));
 
-		// oval->AddVertex(currEdgeVertex);
+		 oval->AddVertex(currEdgeVertex);
 
-		// oval.AddIndex(0);
-		// oval.AddIndex(i);
-		// if (i == numberOfSegments) oval.AddIndex(1);
-		// else oval.AddIndex(i + 1);
-	 //}
+		 vIndices.push_back(0);
+		 vIndices.push_back(i);
+		 if (i == numberOfSegments) 
+			 vIndices.push_back(1);
+		 else 
+			 vIndices.push_back(i + 1);
+	 }
 
-	 //oval->Initialize(context)
-	 //return oval;
-	 return nullptr;
+	 oval->SetIndices(vIndices);
+
+	 oval->Initialize(context, commandPool);
+	 return oval;
  }
 
  void Mesh2D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
@@ -180,6 +178,22 @@ void Mesh3D::AddVertex(Vertex3D vertex)
 {
 	vertex.color = { 1,1,1 };
 	m_vVertices.push_back(vertex);
+}
+
+std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant)
+{
+	auto mesh = std::make_unique<Mesh3D>();
+	std::vector<Vertex3D> vertices{};
+	std::vector<uint32_t> indices{};
+	ParseOBJ(fileName, vertices, indices);
+	for (const auto& vertex : vertices)
+		mesh->AddVertex(vertex);
+	
+	mesh->SetIndices(indices);
+	mesh->SetVertexConstant(vertexConstant);
+	mesh->Initialize(context.physicalDevice, context.device, commandPool, context.graphicsQueue);
+	
+	return mesh;
 }
 
 void Mesh3D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
