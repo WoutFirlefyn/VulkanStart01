@@ -18,6 +18,7 @@ public:
     Mesh& operator=(Mesh&& other) noexcept = delete;
 
 	void Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& device, const CommandPool& commandPool, VkQueue graphicsQueue);
+	void Initialize(const VulkanContext& context, const CommandPool& commandPool);
 
 	void DestroyMesh(const VkDevice& device);
 
@@ -35,7 +36,7 @@ protected:
 	std::unique_ptr<Buffer> m_VertexBuffer;
 	std::unique_ptr<Buffer> m_IndexBuffer;
 	std::vector<uint32_t> m_vIndices{};
-	MeshData m_VertexConstant{ glm::mat4(1) };
+	MeshData m_VertexConstant{};
 
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;
@@ -52,6 +53,9 @@ public:
 	void AddVertex(const glm::vec2& pos, const glm::vec3& color);
 	void AddVertex(const Vertex2D& vertex);
 	std::vector<Vertex2D> GetVertices() const { return m_vVertices; }
+
+	static std::unique_ptr<Mesh2D> CreateRectangle(const VulkanContext& context, const CommandPool& commandPool, int top, int left, int bottom, int right);
+	static std::unique_ptr<Mesh2D> CreateOval(const VulkanContext& context, float centerX, float centerY, float radiusX, float radiusY, int numberOfSegments);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 

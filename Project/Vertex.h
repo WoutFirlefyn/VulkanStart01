@@ -5,7 +5,7 @@
 
 struct Vertex2D
 {	
-	glm::vec2 pos; // should be vec2
+	glm::vec2 pos;
 	glm::vec3 color;
 
 	static VkVertexInputBindingDescription GetBindingDescription() 

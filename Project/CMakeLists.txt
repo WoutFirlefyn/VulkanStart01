@@ -53,16 +53,16 @@ set(SOURCES
     "Camera.h"
 )
 
-add_custom_target(copy_resources ALL)
-add_custom_command(
-	TARGET copy_resources POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_directory
-	${CMAKE_SOURCE_DIR}/resources
-	$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)
-
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )
 add_dependencies(${PROJECT_NAME} Shaders)
 # Link libraries
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARIES} glfw)
+
+add_custom_target(copy_resources ALL)
+add_custom_command(
+	TARGET copy_resources PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	${CMAKE_SOURCE_DIR}/resources
+	$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)

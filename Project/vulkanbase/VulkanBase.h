@@ -89,20 +89,8 @@ private:
 		createDepthResources();
 		createFrameBuffers();
 
-		auto mesh2D = std::make_unique<Mesh2D>();
-		const std::vector<Vertex2D> vertices2D = 
-		{
-			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f , -0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{0.5f ,  0.5f}, {0.0f, 0.0f, 1.0f}},
-			{{-0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}} 
-		};
-		for (const auto& vertex : vertices2D)
-			mesh2D->AddVertex(vertex);
-		mesh2D->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
-		mesh2D->Initialize(physicalDevice, device, m_CommandPool, graphicsQueue);
-		m_GraphicsPipeline2D.AddMesh(std::move(mesh2D));
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
 
 		glm::vec3 offset{ 12, 0, 0 };
 		
