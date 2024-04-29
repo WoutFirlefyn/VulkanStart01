@@ -24,7 +24,6 @@ public:
 	VkPipelineInputAssemblyStateCreateInfo CreateInputAssemblyStateInfo();
 	void Cleanup(const VulkanContext& context);
 	void Record(const CommandBuffer& buffer, VkExtent2D extent);
-	void DrawScene(const CommandBuffer& buffer);
 	void AddMesh(std::unique_ptr<Mesh>&& pMesh);
 	void SetUBO(const ViewProjection& ubo, size_t uboIndex);
 	void SetVertexConstant(const MeshData& vertexConstant);
@@ -117,12 +116,6 @@ inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent
 	scissor.extent = extent;
 	vkCmdSetScissor(buffer.GetVkCommandBuffer(), 0, 1, &scissor);
 
-	DrawScene(buffer);
-}
-
-template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::DrawScene(const CommandBuffer& buffer)
-{
 	m_UBOPool->BindDescriptorSet(buffer.GetVkCommandBuffer(), m_PipelineLayout, 0);
 	for (auto& mesh : m_vMeshes)
 		mesh->Draw(m_PipelineLayout, buffer.GetVkCommandBuffer());

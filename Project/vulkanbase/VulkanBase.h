@@ -203,7 +203,7 @@ private:
 	VkImageView textureImageView;
 	VkSampler textureSampler;
 
-	void createTextureImage(); 
+	void createTextureImage(const std::string& fileName); 
 	void createTextureResources();
 	void createTextureSampler();
 

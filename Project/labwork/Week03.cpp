@@ -74,10 +74,11 @@ void VulkanBase::createRenderPass()
 	}
 }
 
-void VulkanBase::createTextureImage() 
+void VulkanBase::createTextureImage(const std::string& fileName)
 {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("resources/birb.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	std::string filePath = std::string("resources/").c_str() + fileName;
+	stbi_uc* pixels = stbi_load(filePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) {
@@ -103,7 +104,7 @@ void VulkanBase::createTextureImage()
 
 void VulkanBase::createTextureResources() 
 {
-	createTextureImage();
+	createTextureImage("birb.png");
 	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 	createTextureSampler();
 }

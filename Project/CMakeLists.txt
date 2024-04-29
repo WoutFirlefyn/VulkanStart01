@@ -51,7 +51,7 @@ set(SOURCES
     "GraphicsPipeline.h" 
     "UniformBufferObject.h"
     "Camera.h"
-)
+ "Texture.h" "Texture.cpp")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )
@@ -60,7 +60,6 @@ add_dependencies(${PROJECT_NAME} Shaders)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Vulkan_LIBRARIES} glfw)
 target_include_directories(${PROJECT_NAME} PRIVATE ${stb_SOURCE_DIR})
-
 
 add_custom_target(copy_resources ALL)
 add_custom_command(

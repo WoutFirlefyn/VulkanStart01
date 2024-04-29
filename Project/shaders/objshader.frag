@@ -20,5 +20,5 @@ void main()
 
     // Output color
     //outColor = vec4(diffuse, 1.0);
-    outColor = texture(texSampler, fragTexCoord);
+    outColor = texture(texSampler, fragTexCoord) * vec4(diffuse, 1.0);
 }
