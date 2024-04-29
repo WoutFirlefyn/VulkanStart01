@@ -3,11 +3,6 @@
 #include <stb_image.h>
 #include "Buffer.h"
 
-Texture::Texture()
-	: m_TextureId{ m_TextureCount++ }
-{
-}
-
 Texture::~Texture()
 {
 	vkDestroyImageView(m_Context.device, m_TextureImageView, nullptr);

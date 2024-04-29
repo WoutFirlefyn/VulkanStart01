@@ -116,9 +116,11 @@ inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent
 	scissor.extent = extent;
 	vkCmdSetScissor(buffer.GetVkCommandBuffer(), 0, 1, &scissor);
 
-	m_UBOPool->BindDescriptorSet(buffer.GetVkCommandBuffer(), m_PipelineLayout, 0);
-	for (auto& mesh : m_vMeshes)
-		mesh->Draw(m_PipelineLayout, buffer.GetVkCommandBuffer());
+	for (size_t i{}; i < m_vMeshes.size(); ++i)
+	{
+		m_UBOPool->BindDescriptorSet(buffer.GetVkCommandBuffer(), m_PipelineLayout, i);
+		m_vMeshes[i]->Draw(m_PipelineLayout, buffer.GetVkCommandBuffer());
+	}
 }
 
 template<typename Mesh>

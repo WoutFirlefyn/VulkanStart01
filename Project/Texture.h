@@ -6,12 +6,11 @@
 class Texture final
 {
 public:
-	Texture();
+	Texture() = default;
 	~Texture();
 
 	void Initialize(const std::string& fileName, const VulkanContext& context, CommandPool& commandPool);
 
-	int GetTextureId() const { return m_TextureId; }
 	VkImage GetTextureImage() const { return m_TextureImage; }
 	VkImageView GetTextureImageView() const { return m_TextureImageView; }
 	VkSampler GetTextureSampler() const { return m_TextureSampler; }
@@ -35,7 +34,4 @@ private:
 	VkSampler m_TextureSampler{};
 	CommandPool* m_CommandPool{};
 	VulkanContext m_Context{};
-
-	inline static int m_TextureCount = 0;
-	const int m_TextureId;
 };			

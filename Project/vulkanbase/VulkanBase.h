@@ -89,8 +89,8 @@ private:
 
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 
-		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
-		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
+		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
+		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
 
 		glm::vec3 offset{ 12, 0, 0 };
 
@@ -118,7 +118,7 @@ private:
 				MeshData{ glm::translate(glm::mat4(1.0f), -offset) }
 			)));
 
-		m_GraphicsPipeline2D.Initialize(context);
+		//m_GraphicsPipeline2D.Initialize(context);
 		m_GraphicsPipeline3D.Initialize(context);
 
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();

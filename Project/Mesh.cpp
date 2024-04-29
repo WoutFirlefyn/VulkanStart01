@@ -19,6 +19,7 @@ void Mesh::DestroyMesh(const VkDevice& device)
 {
 	m_VertexBuffer.reset();
 	m_IndexBuffer.reset();
+	m_pTexture.reset();
 }
 
 void Mesh::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkCommandBuffer) const
