@@ -20,7 +20,7 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertice
 
 	std::vector<glm::vec3> positions{};
 	std::vector<glm::vec3> normals{};
-	//std::vector<glm::vec2> UVs{};
+	std::vector<glm::vec2> UVs{};
 
 	vertices.clear();
 	indices.clear();
@@ -47,9 +47,9 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertice
 		else if (sCommand == "vt")
 		{
 			// Vertex TexCoord
-			//float u, v;
-			//file >> u >> v;
-			//UVs.emplace_back(u, 1 - v);
+			float u, v;
+			file >> u >> v;
+			UVs.emplace_back(u, 1 - v);
 		}
 		else if (sCommand == "vn")
 		{
@@ -85,7 +85,7 @@ static bool ParseOBJ(const std::string& filename, std::vector<Vertex3D>& vertice
 					{
 						// Optional texture coordinate
 						file >> iTexCoord;
-						//vertex.uv = UVs[iTexCoord - 1];
+						vertex.texCoord = UVs[iTexCoord - 1];
 					}
 
 					if ('/' == file.peek())

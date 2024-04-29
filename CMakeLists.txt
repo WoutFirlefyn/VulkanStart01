@@ -15,6 +15,13 @@ FetchContent_Declare(
   GIT_TAG        3.3.8 # Specify the version you need
 )
 
+FetchContent_Declare(
+  stb
+  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_TAG master
+)
+
+FetchContent_MakeAvailable(stb)
 FetchContent_MakeAvailable(glfw)
 
 # Find the required packages

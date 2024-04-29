@@ -78,18 +78,19 @@ private:
 		
 		// week 03
 		createRenderPass();
-		
-		m_Camera.Initialize(60.f, glm::vec3(0, 2, -15), static_cast<float>(swapChainExtent.width) / swapChainExtent.height);
-
-		m_GraphicsPipeline2D.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
-		m_GraphicsPipeline3D.Initialize({ device, physicalDevice, renderPass, swapChainExtent });
 
 		// week 02
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
+		createTextureResources();
 		createDepthResources();
 		createFrameBuffers();
+		
+		m_Camera.Initialize(60.f, glm::vec3(0, 2, -15), static_cast<float>(swapChainExtent.width) / swapChainExtent.height);
 
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
+		m_GraphicsPipeline2D.Initialize(context, textureImageView, textureSampler);
+		m_GraphicsPipeline3D.Initialize(context, textureImageView, textureSampler);
+
 		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
 		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
 
@@ -135,11 +136,14 @@ private:
 
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-		// this shit should probably have an abstraction
+		vkDestroyImageView(device, textureImageView, nullptr);
+		vkDestroyImage(device, textureImage, nullptr);
+		vkFreeMemory(device, textureImageMemory, nullptr);
+		vkDestroySampler(device, textureSampler, nullptr);
+
 		vkDestroyImageView(device, depthImageView, nullptr);
 		vkDestroyImage(device, depthImage, nullptr);
 		vkFreeMemory(device, depthImageMemory, nullptr);
-		//
 
 		vkDestroyDevice(device, nullptr);
 
@@ -194,6 +198,20 @@ private:
 	void createRenderPass();
 
 	// this shit should probably be in its own class but idc
+	VkImage textureImage;
+	VkDeviceMemory textureImageMemory;
+	VkImageView textureImageView;
+	VkSampler textureSampler;
+
+	void createTextureImage(); 
+	void createTextureResources();
+	void createTextureSampler();
+
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;

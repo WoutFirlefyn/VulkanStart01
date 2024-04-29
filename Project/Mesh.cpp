@@ -34,7 +34,8 @@ void Mesh::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkComman
 		sizeof(MeshData), // Size of the push constants to update
 		&m_VertexConstant // Pointer to the data
 	);
-
+	//															    	   tees |
+	//																	        V
 	vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
 }
 
