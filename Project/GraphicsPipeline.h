@@ -19,7 +19,7 @@ public:
 		const std::string& fragmentShaderFile
 	);
 
-	void Initialize(const VulkanContext& context, VkImageView imageView, VkSampler sampler);
+	void Initialize(const VulkanContext& context);
 	VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo();
 	VkPipelineInputAssemblyStateCreateInfo CreateInputAssemblyStateInfo();
 	void Cleanup(const VulkanContext& context);
@@ -55,12 +55,12 @@ inline GraphicsPipeline<Mesh>::GraphicsPipeline(const std::string& vertexShaderF
 }
 
 template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context, VkImageView imageView, VkSampler sampler)
+inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context)
 {
 	m_RenderPass = context.renderPass;
 	m_Shader.initialize(context);
-	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, 1);
-	m_UBOPool->Initialize(context, imageView, sampler);
+	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, m_vMeshes.size());
+	m_UBOPool->Initialize<Mesh>(context, m_vMeshes);
 	CreateGraphicsPipeline(context);
 }
 

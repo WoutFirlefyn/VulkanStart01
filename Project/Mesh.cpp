@@ -181,7 +181,7 @@ void Mesh3D::AddVertex(Vertex3D vertex)
 	m_vVertices.push_back(vertex);
 }
 
-std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant)
+std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant)
 {
 	auto mesh = std::make_unique<Mesh3D>();
 	std::vector<Vertex3D> vertices{};
@@ -192,6 +192,7 @@ std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, const Vu
 	
 	mesh->SetIndices(indices);
 	mesh->SetVertexConstant(vertexConstant);
+	mesh->SetTexture(pTexture);
 	mesh->Initialize(context.physicalDevice, context.device, commandPool, context.graphicsQueue);
 	
 	return mesh;

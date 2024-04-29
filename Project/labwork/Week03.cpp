@@ -1,6 +1,6 @@
 #include "vulkanbase/VulkanBase.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+//#define STB_IMAGE_IMPLEMENTATION
+//#include <stb_image.h>
 
 void VulkanBase::createFrameBuffers() {
 	swapChainFramebuffers.resize(swapChainImageViews.size());
@@ -19,9 +19,8 @@ void VulkanBase::createFrameBuffers() {
 		framebufferInfo.height = swapChainExtent.height;
 		framebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS)
 			throw std::runtime_error("failed to create framebuffer!");
-		}
 	}
 }
 
@@ -76,66 +75,68 @@ void VulkanBase::createRenderPass()
 
 void VulkanBase::createTextureImage(const std::string& fileName)
 {
-	int texWidth, texHeight, texChannels;
-	std::string filePath = std::string("resources/").c_str() + fileName;
-	stbi_uc* pixels = stbi_load(filePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-	VkDeviceSize imageSize = texWidth * texHeight * 4;
-
-	if (!pixels) {
-		throw std::runtime_error("failed to load texture image!");
-	}
-
-	VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
-	auto stagingBuffer = std::make_unique<Buffer>(context, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imageSize);
-
-	void* data;
-	vkMapMemory(device, stagingBuffer->GetVkBufferMemory(), 0, imageSize, 0, &data);
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
-	vkUnmapMemory(device, stagingBuffer->GetVkBufferMemory());
-
-	stbi_image_free(pixels);
-
-	createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
-
-	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	copyBufferToImage(stagingBuffer->GetVkBuffer(), textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+//	int texWidth, texHeight, texChannels;
+//	std::string filePath = std::string("resources/").c_str() + fileName;
+//	stbi_uc* pixels = stbi_load(filePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+//	VkDeviceSize imageSize = texWidth * texHeight * 4;
+//
+//	if (!pixels)
+//		throw std::runtime_error("failed to load texture image!");
+//
+//
+//	VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
+//	auto stagingBuffer = std::make_unique<Buffer>(context, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, imageSize);
+//
+//	void* data;
+//	vkMapMemory(device, stagingBuffer->GetVkBufferMemory(), 0, imageSize, 0, &data);
+//	memcpy(data, pixels, static_cast<size_t>(imageSize));
+//	vkUnmapMemory(device, stagingBuffer->GetVkBufferMemory());
+//
+//	stbi_image_free(pixels);
+//
+//	createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+//
+//	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+//	copyBufferToImage(stagingBuffer->GetVkBuffer(), textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+//	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void VulkanBase::createTextureResources() 
 {
-	createTextureImage("birb.png");
-	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
-	createTextureSampler();
+	//createTextureImage("birb.png");
+	//textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+	//createTextureSampler();
 }
 
 
-void VulkanBase::createTextureSampler() {
-	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+void VulkanBase::createTextureSampler() 
+{
+	//VkPhysicalDeviceProperties properties{};
+	//vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
-	VkSamplerCreateInfo samplerInfo{};
-	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = VK_FILTER_LINEAR;
-	samplerInfo.minFilter = VK_FILTER_LINEAR;
-	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.anisotropyEnable = VK_TRUE;
-	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
-	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-	samplerInfo.unnormalizedCoordinates = VK_FALSE;
-	samplerInfo.compareEnable = VK_FALSE;
-	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	//VkSamplerCreateInfo samplerInfo{};
+	//samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	//samplerInfo.magFilter = VK_FILTER_LINEAR;
+	//samplerInfo.minFilter = VK_FILTER_LINEAR;
+	//samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	//samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	//samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	//samplerInfo.anisotropyEnable = VK_TRUE;
+	//samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+	//samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	//samplerInfo.unnormalizedCoordinates = VK_FALSE;
+	//samplerInfo.compareEnable = VK_FALSE;
+	//samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	//samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-	if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create texture sampler!");
-	}
+	//if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+	//	throw std::runtime_error("failed to create texture sampler!");
+	//}
 }
 
 
-VkCommandBuffer VulkanBase::beginSingleTimeCommands() {
+VkCommandBuffer VulkanBase::beginSingleTimeCommands() 
+{
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -154,7 +155,8 @@ VkCommandBuffer VulkanBase::beginSingleTimeCommands() {
 	return commandBuffer;
 }
 
-void VulkanBase::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+void VulkanBase::endSingleTimeCommands(VkCommandBuffer commandBuffer) 
+{
 	vkEndCommandBuffer(commandBuffer);
 
 	VkSubmitInfo submitInfo{};
