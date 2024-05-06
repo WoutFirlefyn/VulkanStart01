@@ -77,9 +77,8 @@ void VulkanBase::drawFrame()
 	auto deltaTime = std::chrono::duration<float>(endTime - startTime).count();
 	startTime = endTime;
 	float rotationAngle = 90.f * deltaTime;
-	m_GraphicsPipeline3D.SetUBO(vp, 0);
 	m_GraphicsPipeline3D.SetVertexConstant({ glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3{ 0.f,1.f,0.f }) });
-	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent);
+	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent, vp);
 	// end the render pass
 	endRenderPass(m_CommandBuffer);
 

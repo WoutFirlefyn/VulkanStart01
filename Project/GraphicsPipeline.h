@@ -23,7 +23,7 @@ public:
 	VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo();
 	VkPipelineInputAssemblyStateCreateInfo CreateInputAssemblyStateInfo();
 	void Cleanup(const VulkanContext& context);
-	void Record(const CommandBuffer& buffer, VkExtent2D extent);
+	void Record(const CommandBuffer& buffer, VkExtent2D extent, const ViewProjection& ubo);
 	void AddMesh(std::unique_ptr<Mesh>&& pMesh);
 	void SetUBO(const ViewProjection& ubo, size_t uboIndex);
 	void SetVertexConstant(const MeshData& vertexConstant);
@@ -98,7 +98,7 @@ inline void GraphicsPipeline<Mesh>::Cleanup(const VulkanContext& context)
 }
 
 template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent2D extent)
+inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent2D extent, const ViewProjection& ubo)
 {
 	vkCmdBindPipeline(buffer.GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 
@@ -118,6 +118,7 @@ inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent
 
 	for (size_t i{}; i < m_vMeshes.size(); ++i)
 	{
+		SetUBO(ubo, i);
 		m_UBOPool->BindDescriptorSet(buffer.GetVkCommandBuffer(), m_PipelineLayout, i);
 		m_vMeshes[i]->Draw(m_PipelineLayout, buffer.GetVkCommandBuffer());
 	}

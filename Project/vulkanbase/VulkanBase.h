@@ -94,18 +94,6 @@ private:
 
 		glm::vec3 offset{ 12, 0, 0 };
 
-		auto pVehicleTexture = std::make_shared<Texture>();
-		pVehicleTexture->Initialize("vehicle_diffuse.png", context, m_CommandPool);
-		
-		m_GraphicsPipeline3D.AddMesh(std::move(
-			Mesh3D::CreateMesh(
-				"resources/vehicle.obj",
-				pVehicleTexture,
-				context, 
-				m_CommandPool, 
-				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), offset), glm::vec3(0.5f)) }
-			)));
-
 		auto pBirbTexture = std::make_shared<Texture>();
 		pBirbTexture->Initialize("birb.png", context, m_CommandPool);
 
@@ -116,6 +104,18 @@ private:
 				context, 
 				m_CommandPool, 
 				MeshData{ glm::translate(glm::mat4(1.0f), -offset) }
+			)));
+
+		auto pVehicleTexture = std::make_shared<Texture>();
+		pVehicleTexture->Initialize("vehicle_diffuse.png", context, m_CommandPool);
+		
+		m_GraphicsPipeline3D.AddMesh(std::move(
+			Mesh3D::CreateMesh(
+				"resources/vehicle.obj",
+				pVehicleTexture,
+				context, 
+				m_CommandPool, 
+				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), offset), glm::vec3(0.5f)) }
 			)));
 
 		//m_GraphicsPipeline2D.Initialize(context);

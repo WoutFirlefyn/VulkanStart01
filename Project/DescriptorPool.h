@@ -29,7 +29,7 @@ private:
 	void CreateUBOs(const VulkanContext& context);
 
 	VkDescriptorPool m_DescriptorPool;
-	std::vector<VkDescriptorSet> m_vDescriptorSets;
+	std::vector<VkDescriptorSet> m_vDescriptorSets{};
 	std::vector<UniformBufferObjectPtr<UBO>> m_vUBOs;
 
 	size_t m_Count;
@@ -106,8 +106,8 @@ void DescriptorPool<UBO>::CreateDescriptorSets(std::vector<std::unique_ptr<Mesh>
 
 		VkDescriptorImageInfo imageInfo = {};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = pTexture ? pTexture->GetTextureImageView() : nullptr;
-		imageInfo.sampler = pTexture ? pTexture->GetTextureSampler() : nullptr;
+		imageInfo.imageView = /*pTexture ? */pTexture->GetTextureImageView()/* : nullptr*/;
+		imageInfo.sampler = /*pTexture ? */pTexture->GetTextureSampler()/* : nullptr*/;
 
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -128,40 +128,6 @@ void DescriptorPool<UBO>::CreateDescriptorSets(std::vector<std::unique_ptr<Mesh>
 
 		vkUpdateDescriptorSets(m_Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
-
-	//size_t descriptorIndex = 0;
-	//for (UniformBufferObjectPtr<UBO>& buffer : m_vUBOs)
-	//{
-	//	VkDescriptorBufferInfo bufferInfo{};
-	//	bufferInfo.buffer = buffer->GetVkBuffer();
-	//	bufferInfo.offset = 0;
-	//	bufferInfo.range = m_Size;
-
-	//	VkDescriptorImageInfo imageInfo{};
-	//	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	//	imageInfo.imageView = imageView;	
-	//	imageInfo.sampler = sampler;
-
-	//	std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-	//	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	//	descriptorWrites[0].dstSet = m_vDescriptorSets[descriptorIndex];
-	//	descriptorWrites[0].dstBinding = 0;
-	//	descriptorWrites[0].dstArrayElement = 0;
-	//	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//	descriptorWrites[0].descriptorCount = 1;
-	//	descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-	//	descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	//	descriptorWrites[1].dstSet = m_vDescriptorSets[descriptorIndex];
-	//	descriptorWrites[1].dstBinding = 1;
-	//	descriptorWrites[1].dstArrayElement = 0;
-	//	descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//	descriptorWrites[1].descriptorCount = 1;
-	//	descriptorWrites[1].pImageInfo = &imageInfo;
-
-	//	vkUpdateDescriptorSets(m_Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-	//	++descriptorIndex;
-	//}
 }
 
 template <class UBO>
