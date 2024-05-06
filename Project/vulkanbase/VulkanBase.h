@@ -81,7 +81,6 @@ private:
 
 		// week 02
 		m_CommandPool.Initialize(device, findQueueFamilies(physicalDevice));
-		createTextureResources();
 		createDepthResources();
 		createFrameBuffers();
 		
@@ -158,11 +157,6 @@ private:
 
 		vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-		//vkDestroyImageView(device, textureImageView, nullptr);
-		//vkDestroyImage(device, textureImage, nullptr);
-		//vkFreeMemory(device, textureImageMemory, nullptr);
-		//vkDestroySampler(device, textureSampler, nullptr);
-
 		vkDestroyImageView(device, depthImageView, nullptr);
 		vkDestroyImage(device, depthImage, nullptr);
 		vkFreeMemory(device, depthImageMemory, nullptr);
@@ -219,21 +213,8 @@ private:
 	void createFrameBuffers();
 	void createRenderPass();
 
-	// this shit should probably be in its own class but idc
-	//VkImage textureImage;
-	//VkDeviceMemory textureImageMemory;
-	//VkImageView textureImageView;
-	//VkSampler textureSampler;
-
-	void createTextureImage(const std::string& fileName); 
-	void createTextureResources();
-	void createTextureSampler();
-
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
@@ -246,7 +227,6 @@ private:
 	uint32_t findMemoryType(uint32_t typeFilter, const VkMemoryPropertyFlags& properties) const;
 	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-	////
 
 	// Week 04
 	// Swap chain and image view support
