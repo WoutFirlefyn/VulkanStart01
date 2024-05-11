@@ -18,11 +18,18 @@ FetchContent_Declare(
 FetchContent_Declare(
   stb
   GIT_REPOSITORY https://github.com/nothings/stb.git
-  GIT_TAG master
+  GIT_TAG		 master
 )
 
-FetchContent_MakeAvailable(stb)
+FetchContent_Declare(
+  tinyobjloader
+  GIT_REPOSITORY https://github.com/tinyobjloader/tinyobjloader.git
+  GIT_TAG		 v1.0.6
+)
+
 FetchContent_MakeAvailable(glfw)
+FetchContent_MakeAvailable(stb)
+FetchContent_MakeAvailable(tinyobjloader)
 
 # Find the required packages
 find_package(Vulkan REQUIRED)

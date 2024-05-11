@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <chrono>
+#include <iostream>
 
 #include "GP2Shader.h"
 #include "vulkanbase/VulkanUtil.h"

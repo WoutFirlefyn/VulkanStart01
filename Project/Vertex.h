@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 #include "vulkanbase/VulkanUtil.h"
 #include <array>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 struct Vertex2D
 {	
@@ -40,7 +42,12 @@ struct Vertex3D
 	glm::vec3 pos;
 	glm::vec3 normal;
 	glm::vec3 color;
-	glm::vec2 texCoord;
+	glm::vec2 texCoord; 
+
+	bool operator==(const Vertex3D& other) const 
+	{
+		return pos == other.pos && color == other.color && texCoord == other.texCoord;
+	}
 
 	static VkVertexInputBindingDescription GetBindingDescription() 
 	{
@@ -78,6 +85,17 @@ struct Vertex3D
 		return attributeDescriptions;
 	}
 };
+
+namespace std 
+{
+	template<> struct hash<Vertex3D> 
+	{
+		size_t operator()(Vertex3D const& vertex) const 
+		{
+			return ((hash<glm::vec3>()(vertex.pos) ^ (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^ (hash<glm::vec2>()(vertex.texCoord) << 1);
+		}
+	};
+}
 
 struct ViewProjection 
 {

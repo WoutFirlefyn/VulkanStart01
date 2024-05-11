@@ -7,7 +7,7 @@
 #include "GP2Shader.h"
 #include "CommandBuffer.h"
 #include "Mesh.h"
-#include "Mesh.h"
+#include "Instance.h"
 
 template <typename Mesh>
 class GraphicsPipeline
@@ -16,7 +16,8 @@ public:
 	GraphicsPipeline
 	(
 		const std::string& vertexShaderFile,
-		const std::string& fragmentShaderFile
+		const std::string& fragmentShaderFile, 
+		bool instanced
 	);
 
 	void Initialize(const VulkanContext& context);
@@ -32,7 +33,7 @@ private:
 	VkPushConstantRange CreatePushConstantRange();
 
 	std::vector<VkVertexInputAttributeDescription> m_AttributeDescriptions;
-	VkVertexInputBindingDescription m_InputBinding;
+	std::vector<VkVertexInputBindingDescription> m_BindingDescriptions;
 
 	std::unique_ptr<DescriptorPool<ViewProjection>> m_UBOPool;
 	GP2Shader m_Shader;
@@ -40,18 +41,28 @@ private:
 	VkPipelineLayout m_PipelineLayout{};
 	VkPipeline m_GraphicsPipeline{};
 	std::vector<std::unique_ptr<Mesh>> m_vMeshes{};
+	bool m_Instanced{ false };
 };
 
 template<typename Mesh>
-inline GraphicsPipeline<Mesh>::GraphicsPipeline(const std::string& vertexShaderFile, const std::string& fragmentShaderFile)
+inline GraphicsPipeline<Mesh>::GraphicsPipeline(const std::string& vertexShaderFile, const std::string& fragmentShaderFile, bool instanced)
 	: m_Shader{ vertexShaderFile, fragmentShaderFile }
-	, m_InputBinding{}
+	, m_BindingDescriptions{}
 	, m_AttributeDescriptions{}
+	, m_Instanced{ instanced }
 {
 	using Vertex = std::conditional_t<std::is_same_v<Mesh, Mesh2D>, Vertex2D, Vertex3D>;
 
-	m_InputBinding = Vertex::GetBindingDescription();
+	m_BindingDescriptions.emplace_back(Vertex::GetBindingDescription());
 	m_AttributeDescriptions = Vertex::GetAttributeDescriptions();
+
+	if (m_Instanced) 
+	{
+		uint32_t startAttrLoc = static_cast<uint32_t>(m_AttributeDescriptions.size());
+		m_BindingDescriptions.emplace_back(InstanceVertex::GetBindingDescription());
+		auto instancedAttributeDescriptions = InstanceVertex::GetAttributeDescriptions(startAttrLoc);
+		m_AttributeDescriptions.insert(m_AttributeDescriptions.end(), instancedAttributeDescriptions.begin(), instancedAttributeDescriptions.end());
+	}
 }
 
 template<typename Mesh>
@@ -59,7 +70,7 @@ inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context)
 {
 	m_RenderPass = context.renderPass;
 	m_Shader.initialize(context);
-	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, m_vMeshes.size());
+	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, m_vMeshes.size(), std::is_same_v<Mesh, Mesh3D>);
 	m_UBOPool->Initialize<Mesh>(context, m_vMeshes);
 	CreateGraphicsPipeline(context);
 }
@@ -69,10 +80,10 @@ inline VkPipelineVertexInputStateCreateInfo GraphicsPipeline<Mesh>::CreateVertex
 {
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(m_AttributeDescriptions.size());
-	vertexInputInfo.pVertexBindingDescriptions = &m_InputBinding;
+	vertexInputInfo.pVertexBindingDescriptions = m_BindingDescriptions.data();
+	vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(m_BindingDescriptions.size());
 	vertexInputInfo.pVertexAttributeDescriptions = m_AttributeDescriptions.data();
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(m_AttributeDescriptions.size());
 	return vertexInputInfo;
 }
 

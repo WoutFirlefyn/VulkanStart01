@@ -91,34 +91,35 @@ private:
 		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
 		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
 
-		glm::vec3 offset{ 12, 0, 0 };
+		//glm::vec3 offset{ 12, 0, 0 };
 
 		auto pBirbTexture = std::make_shared<Texture>();
 		pBirbTexture->Initialize("birb.png", context, m_CommandPool);
-
-		m_GraphicsPipeline3D.AddMesh(std::move(
-			Mesh3D::CreateMesh(
-				"resources/birb.obj",
-				pBirbTexture,
-				context, 
-				m_CommandPool, 
-				MeshData{ glm::translate(glm::mat4(1.0f), -offset) }
-			)));
-
 		auto pVehicleTexture = std::make_shared<Texture>();
 		pVehicleTexture->Initialize("vehicle_diffuse.png", context, m_CommandPool);
-		
+
 		m_GraphicsPipeline3D.AddMesh(std::move(
 			Mesh3D::CreateMesh(
 				"resources/vehicle.obj",
 				pVehicleTexture,
 				context, 
 				m_CommandPool, 
-				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), offset), glm::vec3(0.5f)) }
+				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{-20, 0 ,0}), glm::vec3(0.5f))}
+			)));
+		
+		m_GraphicsPipelineInstancing.AddMesh(std::move(
+			Mesh3D::CreateMesh(
+				"resources/birb.obj",
+				pBirbTexture,
+				context, 
+				m_CommandPool, 
+				MeshData{ glm::mat4(1) },
+				10000
 			)));
 
-		//m_GraphicsPipeline2D.Initialize(context);
+		m_GraphicsPipeline2D.Initialize(context);
 		m_GraphicsPipeline3D.Initialize(context);
+		m_GraphicsPipelineInstancing.Initialize(context);
 
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		
@@ -146,6 +147,7 @@ private:
 
 		m_GraphicsPipeline2D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
 		m_GraphicsPipeline3D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
+		m_GraphicsPipelineInstancing.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
 
 		vkDestroyRenderPass(device, renderPass, nullptr);
 
@@ -202,11 +204,18 @@ private:
 	VkRenderPass renderPass;
 	GraphicsPipeline<Mesh2D> m_GraphicsPipeline2D{
 		"shaders/shader.vert.spv",
-		"shaders/shader.frag.spv"
+		"shaders/shader.frag.spv",
+		false
 	};
 	GraphicsPipeline<Mesh3D> m_GraphicsPipeline3D{
 		"shaders/objshader.vert.spv",
-		"shaders/objshader.frag.spv"
+		"shaders/objshader.frag.spv",
+		false
+	};
+	GraphicsPipeline<Mesh3D> m_GraphicsPipelineInstancing{
+		"shaders/instancedobjshader.vert.spv",
+		"shaders/instancedobjshader.frag.spv",
+		true
 	};
 
 

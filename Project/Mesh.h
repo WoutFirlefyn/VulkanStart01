@@ -7,6 +7,7 @@
 #include "Buffer.h"
 #include "CommandPool.h"
 #include "Texture.h"
+#include "Instance.h"
 
 class Mesh
 {
@@ -23,9 +24,11 @@ public:
 
 	void DestroyMesh(const VkDevice& device);
 
-	void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer) const;
+	void Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& cmdBuffer);
 
 	void SetIndices(const std::vector<uint32_t>& vIndices);
+
+	void SetInstanceCount(uint32_t instanceCount) { m_InstanceCount = instanceCount; }
 
 	void SetVertexConstant(const MeshData& vertexConstant) { m_VertexConstant = vertexConstant; }
 	const MeshData& GetVertexConstant() const { return m_VertexConstant; }
@@ -33,7 +36,8 @@ public:
 	void SetTexture(std::shared_ptr<Texture> pTexture) { m_pTexture = pTexture; }
 	Texture* GetTexture() const { return m_pTexture ? m_pTexture.get() : nullptr; }
 
-	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue);
+	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue); 
+	void SetInstanceData(uint32_t instanceId, const glm::vec3& t, const glm::vec2& tc);
 protected:
 	Mesh() = default;
 	std::unique_ptr<Buffer> m_VertexBuffer;
@@ -41,9 +45,13 @@ protected:
 	std::vector<uint32_t> m_vIndices{};
 	MeshData m_VertexConstant{};
 	std::shared_ptr<Texture> m_pTexture{ nullptr };
+	uint32_t m_InstanceCount{ 1 };
+	std::vector<InstanceVertex> m_vInstanceData;
+	std::unique_ptr<Buffer> m_InstanceBuffer;
 
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;
+	void CreateInstancedVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
 	void CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
 };
 
@@ -77,7 +85,7 @@ public:
 	void AddVertex(Vertex3D vertex);
 	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
 
-	static std::unique_ptr<Mesh3D> CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant = MeshData{ glm::mat4(1) });
+	static std::unique_ptr<Mesh3D> CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant = MeshData{ glm::mat4(1) }, uint32_t instanceCount = 1);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 

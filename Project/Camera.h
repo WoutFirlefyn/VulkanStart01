@@ -33,7 +33,7 @@ struct Camera
     glm::mat4 projectionMatrix{};
 
     float nearPlane{ 0.1f };
-    float farPlane{ 100.f };
+    float farPlane{ 1000.f };
 
     glm::vec2 dragStart{};
 

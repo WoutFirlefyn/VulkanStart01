@@ -72,11 +72,11 @@ uint32_t Buffer::FindMemoryType(const VkPhysicalDevice& physicalDevice, uint32_t
 	throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void Buffer::BindAsVertexBuffer(VkCommandBuffer commandBuffer)  const
+void Buffer::BindAsVertexBuffer(VkCommandBuffer commandBuffer, uint32_t binding) const
 {
 	VkBuffer vertexBuffers[] = { m_Buffer };
 	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindVertexBuffers(commandBuffer, binding, 1, vertexBuffers, offsets);
 }
 
 void Buffer::BindAsIndexBuffer(VkCommandBuffer commandBuffer) const

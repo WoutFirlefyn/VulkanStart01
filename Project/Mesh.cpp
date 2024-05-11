@@ -8,6 +8,25 @@ void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& de
 {
 	CreateVertexBuffer(physicalDevice, device, commandPool, graphicsQueue);
 	CreateIndexBuffer(physicalDevice, device, commandPool, graphicsQueue);
+	//for (auto& test : m_vInstanceData)
+	//{
+	//	test.modelTransform = glm::mat4(1.0f);
+	//	test.texCoord = glm::vec2(0.5);
+	//}
+	glm::mat4 transform;
+	for (int i{}; i < m_InstanceCount; ++i)
+	{
+		int x = i % 100;
+		int y = i / 100;
+		InstanceVertex instance{};
+		//instance.texCoord = { 0.5f, 0.7f };
+		transform = glm::translate(glm::mat4(1.f), glm::vec3{ 12.f * x, 0, 12.f * y });
+		transform = glm::rotate(transform, glm::radians(static_cast<float>(rand() % 360)), glm::vec3{ 0,1,0 });
+		//transform = glm::rotate(transform, 0.9f, glm::vec3{ 1.f * x, 1.f * y, 0.f });
+		instance.modelTransform = transform;
+		m_vInstanceData.push_back(instance);
+	}
+	CreateInstancedVertexBuffer(physicalDevice, device, commandPool, graphicsQueue);
 }
 
 void Mesh::Initialize(const VulkanContext& context, const CommandPool& commandPool)
@@ -19,10 +38,11 @@ void Mesh::DestroyMesh(const VkDevice& device)
 {
 	m_VertexBuffer.reset();
 	m_IndexBuffer.reset();
+	m_InstanceBuffer.reset();
 	m_pTexture.reset();
 }
 
-void Mesh::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkCommandBuffer) const
+void Mesh::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkCommandBuffer)
 {
 	m_VertexBuffer->BindAsVertexBuffer(vkCommandBuffer);
 	m_IndexBuffer->BindAsIndexBuffer(vkCommandBuffer);
@@ -35,14 +55,25 @@ void Mesh::Draw(VkPipelineLayout pipelineLayout, const VkCommandBuffer& vkComman
 		sizeof(MeshData), // Size of the push constants to update
 		&m_VertexConstant // Pointer to the data
 	);
-	//															    	   tees |
-	//																	        V
-	vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), 1, 0, 0, 0);
+
+	if (m_InstanceCount > 1) 
+	{
+		 m_InstanceBuffer->Upload(m_vInstanceData.data());
+		 m_InstanceBuffer->BindAsVertexBuffer(vkCommandBuffer, 1);
+	}
+	vkCmdDrawIndexed(vkCommandBuffer, static_cast<uint32_t>(m_vIndices.size()), m_InstanceCount, 0, 0, 0);
 }
 
 void Mesh::SetIndices(const std::vector<uint32_t>& vIndices)
 {
 	m_vIndices = vIndices;
+}
+
+void Mesh::CreateInstancedVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
+{
+	VkDeviceSize bufferSize = sizeof(InstanceVertex) * m_vInstanceData.size();
+	m_InstanceBuffer = std::make_unique<Buffer>(physicalDevice, device, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, bufferSize);
+	m_InstanceBuffer->Map();
 }
 
 void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
@@ -87,6 +118,14 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 commandBuffer.FreeBuffer(device, commandPool);
  }
 
+ void Mesh::SetInstanceData(uint32_t instanceId, const glm::vec3& t, const glm::vec2& tc)
+ {
+	if (instanceId < m_InstanceCount)
+	{
+		m_vInstanceData[instanceId].modelTransform = glm::translate(glm::mat4(1.0f), t);
+		m_vInstanceData[instanceId].texCoord = tc;
+	}
+ }
  //////////////////////////////////////////////
 
 
@@ -155,6 +194,7 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 
  void Mesh2D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
+	//m_vInstanceData.resize(m_vVertices.size());
 	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();
 
 	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };
@@ -182,7 +222,7 @@ void Mesh3D::AddVertex(Vertex3D vertex)
 	m_vVertices.push_back(vertex);
 }
 
-std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant)
+std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant, uint32_t instanceCount)
 {
 	auto mesh = std::make_unique<Mesh3D>();
 	std::vector<Vertex3D> vertices{};
@@ -192,6 +232,7 @@ std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::sha
 		mesh->AddVertex(vertex);
 	
 	mesh->SetIndices(indices);
+	mesh->SetInstanceCount(instanceCount);
 	mesh->SetVertexConstant(vertexConstant);
 	mesh->SetTexture(pTexture);
 	mesh->Initialize(context.physicalDevice, context.device, commandPool, context.graphicsQueue);
@@ -201,6 +242,7 @@ std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::sha
 
 void Mesh3D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
+	//m_vInstanceData.resize(m_vVertices.size());
 	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();
 
 	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };

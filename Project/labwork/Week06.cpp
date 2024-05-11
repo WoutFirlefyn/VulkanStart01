@@ -63,8 +63,7 @@ void VulkanBase::drawFrame()
 	vp.view = glm::translate(vp.view, glm::vec3(-static_cast<float>(swapChainExtent.width), -static_cast<float>(swapChainExtent.height), 0.0f));
 	vp.view = glm::scale(vp.view, glm::vec3(2.f, 2.f, 1.0f));
 	// draw pipeline 1.
-	//m_GraphicsPipeline2D.SetUBO(vp, 0);
-	//m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent);
+	m_GraphicsPipeline2D.Record(m_CommandBuffer, swapChainExtent, vp);
 
 	// 3D camera matrix.
 	m_Camera.Update();
@@ -79,6 +78,8 @@ void VulkanBase::drawFrame()
 	float rotationAngle = 90.f * deltaTime;
 	m_GraphicsPipeline3D.SetVertexConstant({ glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3{ 0.f,1.f,0.f }) });
 	m_GraphicsPipeline3D.Record(m_CommandBuffer, swapChainExtent, vp);
+	m_GraphicsPipelineInstancing.SetVertexConstant({ glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3{ 0.f,1.f,0.f }) });
+	m_GraphicsPipelineInstancing.Record(m_CommandBuffer, swapChainExtent, vp);
 	// end the render pass
 	endRenderPass(m_CommandBuffer);
 

@@ -46,7 +46,7 @@ public:
 
 	void Upload(void* data);
 	void Map();
-	void BindAsVertexBuffer(VkCommandBuffer commandBuffer) const;
+	void BindAsVertexBuffer(VkCommandBuffer commandBuffer, uint32_t binding = 0) const;
 	void BindAsIndexBuffer(VkCommandBuffer commandBuffer) const;
 	const VkBuffer& GetVkBuffer() const { return m_Buffer; }
 	const VkDeviceMemory& GetVkBufferMemory() const { return m_BufferMemory; }
