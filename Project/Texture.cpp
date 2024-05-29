@@ -3,15 +3,7 @@
 #include <stb_image.h>
 #include "Buffer.h"
 
-Texture::~Texture()
-{
-	vkDestroyImageView(m_Context.device, m_TextureImageView, nullptr);
-	vkDestroyImage(m_Context.device, m_TextureImage, nullptr);
-	vkFreeMemory(m_Context.device, m_TextureImageMemory, nullptr);
-	vkDestroySampler(m_Context.device, m_TextureSampler, nullptr);
-}
-
-void Texture::Initialize(const std::string& fileName, const VulkanContext& context, CommandPool& commandPool)
+Texture::Texture(const std::string& fileName, const VulkanContext& context, CommandPool& commandPool)
 {
 	m_CommandPool = &commandPool;
 	m_Context = context;
@@ -19,6 +11,14 @@ void Texture::Initialize(const std::string& fileName, const VulkanContext& conte
 	CreateTextureImage(fileName);
 	CreateTextureImageView(VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 	CreateTextureSampler();
+}
+
+Texture::~Texture()
+{
+	vkDestroyImageView(m_Context.device, m_TextureImageView, nullptr);
+	vkDestroyImage(m_Context.device, m_TextureImage, nullptr);
+	vkFreeMemory(m_Context.device, m_TextureImageMemory, nullptr);
+	vkDestroySampler(m_Context.device, m_TextureSampler, nullptr);
 }
 
 void Texture::CreateTextureImage(const std::string& fileName)

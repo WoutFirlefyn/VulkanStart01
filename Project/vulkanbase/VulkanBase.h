@@ -88,15 +88,14 @@ private:
 
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 
-		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
-		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
 
 		//glm::vec3 offset{ 12, 0, 0 };
 
-		auto pBirbTexture = std::make_shared<Texture>();
-		pBirbTexture->Initialize("birb.png", context, m_CommandPool);
-		auto pVehicleTexture = std::make_shared<Texture>();
-		pVehicleTexture->Initialize("vehicle_diffuse.png", context, m_CommandPool);
+		auto pBirbTexture = std::make_shared<Texture>("birb.png", context, m_CommandPool);
+		auto pVehicleTexture = std::make_shared<Texture>("vehicle_diffuse.png", context, m_CommandPool);
+		auto pGrassTexture = std::make_shared<Texture>("GrassBlock.png", context, m_CommandPool);
 
 		m_GraphicsPipeline3D.AddMesh(std::move(
 			Mesh3D::CreateMesh(
@@ -104,7 +103,8 @@ private:
 				pVehicleTexture,
 				context, 
 				m_CommandPool, 
-				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{-20, 0 ,0}), glm::vec3(0.5f))}
+				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{-20, 0 ,0}), glm::vec3(0.5f))},
+				1
 			)));
 		
 		m_GraphicsPipelineInstancing.AddMesh(std::move(
@@ -113,8 +113,18 @@ private:
 				pBirbTexture,
 				context, 
 				m_CommandPool, 
-				MeshData{ glm::mat4(1) },
-				10000
+				MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.25f)) },
+				100000
+			)));
+		
+		m_GraphicsPipelineInstancing.AddMesh(std::move(
+			Mesh3D::CreateMesh(
+				"resources/cube.obj",
+				pGrassTexture,
+				context,
+				m_CommandPool,
+				MeshData{ glm::translate((glm::rotate(glm::mat4(1), glm::radians(90.f), {0,1,0})),{20,0,0}) },
+				100000
 			)));
 
 		m_GraphicsPipeline2D.Initialize(context);

@@ -8,21 +8,18 @@ void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& de
 {
 	CreateVertexBuffer(physicalDevice, device, commandPool, graphicsQueue);
 	CreateIndexBuffer(physicalDevice, device, commandPool, graphicsQueue);
-	//for (auto& test : m_vInstanceData)
-	//{
-	//	test.modelTransform = glm::mat4(1.0f);
-	//	test.texCoord = glm::vec2(0.5);
-	//}
+	InstancedMeshData data = m_InstancedMeshData;
 	glm::mat4 transform;
 	for (int i{}; i < m_InstanceCount; ++i)
 	{
 		int x = i % 100;
 		int y = i / 100;
 		InstanceVertex instance{};
-		//instance.texCoord = { 0.5f, 0.7f };
-		transform = glm::translate(glm::mat4(1.f), glm::vec3{ 12.f * x, 0, 12.f * y });
-		transform = glm::rotate(transform, glm::radians(static_cast<float>(rand() % 360)), glm::vec3{ 0,1,0 });
-		//transform = glm::rotate(transform, 0.9f, glm::vec3{ 1.f * x, 1.f * y, 0.f });
+		transform = glm::translate(GetVertexConstant().model, glm::vec3{ 10.f * x, 0, 10.f * y });
+		m_InstancedMeshData.RandomizeTranslation(transform);
+		m_InstancedMeshData.RandomizeRotation(transform);
+		m_InstancedMeshData.RandomizeScale(transform);
+
 		instance.modelTransform = transform;
 		m_vInstanceData.push_back(instance);
 	}
@@ -242,7 +239,6 @@ std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::sha
 
 void Mesh3D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
-	//m_vInstanceData.resize(m_vVertices.size());
 	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();
 
 	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };

@@ -68,6 +68,9 @@ inline GraphicsPipeline<Mesh>::GraphicsPipeline(const std::string& vertexShaderF
 template<typename Mesh>
 inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context)
 {
+	if (m_vMeshes.size() == 0)
+		return;
+
 	m_RenderPass = context.renderPass;
 	m_Shader.initialize(context);
 	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, m_vMeshes.size(), std::is_same_v<Mesh, Mesh3D>);
@@ -111,6 +114,9 @@ inline void GraphicsPipeline<Mesh>::Cleanup(const VulkanContext& context)
 template<typename Mesh>
 inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent2D extent, const ViewProjection& ubo)
 {
+	if (m_vMeshes.size() == 0)
+		return;
+
 	vkCmdBindPipeline(buffer.GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 
 	VkViewport viewport{};

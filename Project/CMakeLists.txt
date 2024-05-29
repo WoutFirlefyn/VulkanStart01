@@ -53,8 +53,7 @@ set(SOURCES
     "Camera.h"
     "Texture.h" 
     "Texture.cpp" 
-    "Instance.h"
-)
+    "Instance.h")
 
 # Create the executable
 add_executable(${PROJECT_NAME} ${SOURCES} ${GLSL_SOURCE_FILES}   )

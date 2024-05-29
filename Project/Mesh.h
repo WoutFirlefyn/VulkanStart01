@@ -9,6 +9,41 @@
 #include "Texture.h"
 #include "Instance.h"
 
+struct InstancedMeshData
+{
+	glm::vec3 minOffset{ 0,0,0 };
+	glm::vec3 maxOffset{ 10,10,10 };
+
+	float minScale{ 0.f };
+	float maxScale{ 4.f };
+
+	float minAngle{ 0.f };
+	float maxAngle{ 360.f };
+	glm::vec3 rotationAxis{ 0,1,0 };
+
+	void RandomizeTranslation(glm::mat4& mat) const
+	{
+		glm::vec3 translation(GetRand(minOffset.x, maxOffset.x), GetRand(minOffset.y, maxOffset.y), GetRand(minOffset.z, maxOffset.z));
+		mat = glm::translate(mat, translation);
+	}
+
+	void RandomizeScale(glm::mat4& mat) const
+	{
+		mat = glm::scale(mat, glm::vec3(GetRand(minScale, maxScale)));
+	}
+
+	void RandomizeRotation(glm::mat4& mat) const
+	{
+		mat = glm::rotate(mat, GetRand(minAngle, maxAngle), rotationAxis);
+	}
+
+private:
+	float GetRand(float min, float max) const
+	{
+		return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
+	}
+};
+
 class Mesh
 {
 public:
@@ -30,6 +65,8 @@ public:
 
 	void SetInstanceCount(uint32_t instanceCount) { m_InstanceCount = instanceCount; }
 
+	void SetInstancedMeshData(const InstancedMeshData& data) { m_InstancedMeshData = data; }
+
 	void SetVertexConstant(const MeshData& vertexConstant) { m_VertexConstant = vertexConstant; }
 	const MeshData& GetVertexConstant() const { return m_VertexConstant; }
 
@@ -48,6 +85,8 @@ protected:
 	uint32_t m_InstanceCount{ 1 };
 	std::vector<InstanceVertex> m_vInstanceData;
 	std::unique_ptr<Buffer> m_InstanceBuffer;
+	InstancedMeshData m_InstancedMeshData{};
+
 
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;

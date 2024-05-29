@@ -102,9 +102,7 @@ void DescriptorPool<UBO>::CreateDescriptorSets(std::vector<std::unique_ptr<Mesh>
 		throw std::runtime_error("failed to allocate descriptor sets!");
 
 	for (size_t i = 0; i < vMeshes.size(); ++i) 
-	{	
-		auto pTexture = vMeshes[i]->GetTexture();
-
+	{
 		VkDescriptorBufferInfo bufferInfo{};
 		bufferInfo.buffer = m_vUBOs[i]->GetVkBuffer();
 		bufferInfo.offset = 0;
@@ -119,15 +117,16 @@ void DescriptorPool<UBO>::CreateDescriptorSets(std::vector<std::unique_ptr<Mesh>
 		descriptorWrites[0].descriptorCount = 1;
 		descriptorWrites[0].pBufferInfo = &bufferInfo;
 
-		if (pTexture)
+		if (m_TexturesEnabled)
 		{
-			descriptorWrites.resize(2);
+			auto pTexture = vMeshes[i]->GetTexture();
 
 			VkDescriptorImageInfo imageInfo = {};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = pTexture->GetTextureImageView();
 			imageInfo.sampler = pTexture->GetTextureSampler();
 
+			descriptorWrites.resize(2);
 			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[1].dstSet = m_vDescriptorSets[i];
 			descriptorWrites[1].dstBinding = 1;

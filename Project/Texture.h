@@ -6,10 +6,8 @@
 class Texture final
 {
 public:
-	Texture() = default;
+	Texture(const std::string& fileName, const VulkanContext& context, CommandPool& commandPool);
 	~Texture();
-
-	void Initialize(const std::string& fileName, const VulkanContext& context, CommandPool& commandPool);
 
 	VkImage GetTextureImage() const { return m_TextureImage; }
 	VkImageView GetTextureImageView() const { return m_TextureImageView; }
