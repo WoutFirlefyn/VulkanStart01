@@ -72,19 +72,19 @@ struct Camera
     {
         if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
         {
-            origin += forward;
+            origin += forward * 10.f;
         }
         if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
         {
-            origin -= forward;
+            origin -= forward * 10.f;
         }
         if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
         {
-            origin += right;
+            origin += right * 10.f;
         }
         if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS))
         {
-            origin -= right;
+            origin -= right * 10.f;
         }
     }
 

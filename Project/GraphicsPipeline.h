@@ -20,12 +20,12 @@ public:
 		bool instanced
 	);
 
-	void Initialize(const VulkanContext& context);
+	void Initialize(const VulkanContext& context, const CommandPool& commandPool);
 	VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo();
 	VkPipelineInputAssemblyStateCreateInfo CreateInputAssemblyStateInfo();
 	void Cleanup(const VulkanContext& context);
 	void Record(const CommandBuffer& buffer, VkExtent2D extent, const ViewProjection& ubo);
-	void AddMesh(std::unique_ptr<Mesh>&& pMesh);
+	Mesh* AddMesh(std::unique_ptr<Mesh>&& pMesh);
 	void SetUBO(const ViewProjection& ubo, size_t uboIndex);
 	void SetVertexConstant(const MeshData& vertexConstant);
 private:
@@ -66,10 +66,13 @@ inline GraphicsPipeline<Mesh>::GraphicsPipeline(const std::string& vertexShaderF
 }
 
 template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context)
+inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context, const CommandPool& commandPool)
 {
 	if (m_vMeshes.size() == 0)
 		return;
+
+	for (auto& pMesh : m_vMeshes)
+		pMesh->Initialize(context, commandPool);
 
 	m_RenderPass = context.renderPass;
 	m_Shader.initialize(context);
@@ -142,9 +145,10 @@ inline void GraphicsPipeline<Mesh>::Record(const CommandBuffer& buffer, VkExtent
 }
 
 template<typename Mesh>
-inline void GraphicsPipeline<Mesh>::AddMesh(std::unique_ptr<Mesh>&& pMesh)
+inline Mesh* GraphicsPipeline<Mesh>::AddMesh(std::unique_ptr<Mesh>&& pMesh)
 {
 	m_vMeshes.push_back(std::move(pMesh));
+	return m_vMeshes.back().get();
 }
 
 template<typename Mesh>

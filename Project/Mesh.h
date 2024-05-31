@@ -124,7 +124,7 @@ public:
 	void AddVertex(Vertex3D vertex);
 	std::vector<Vertex3D> GetVertices() const { return m_vVertices; }
 
-	static std::unique_ptr<Mesh3D> CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant = MeshData{ glm::mat4(1) }, uint32_t instanceCount = 1);
+	static std::unique_ptr<Mesh3D> CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 

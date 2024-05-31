@@ -97,39 +97,47 @@ private:
 		auto pVehicleTexture = std::make_shared<Texture>("vehicle_diffuse.png", context, m_CommandPool);
 		auto pGrassTexture = std::make_shared<Texture>("GrassBlock.png", context, m_CommandPool);
 
-		m_GraphicsPipeline3D.AddMesh(std::move(
+		auto pVehicle = m_GraphicsPipeline3D.AddMesh(std::move(
 			Mesh3D::CreateMesh(
 				"resources/vehicle.obj",
 				pVehicleTexture,
 				context, 
-				m_CommandPool, 
-				MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{-20, 0 ,0}), glm::vec3(0.5f))},
-				1
+				m_CommandPool
 			)));
+
+		pVehicle->SetVertexConstant(MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{-20, 0 ,0}), glm::vec3(0.5f)) });
 		
-		m_GraphicsPipelineInstancing.AddMesh(std::move(
+		auto pBirb = m_GraphicsPipelineInstancing.AddMesh(std::move(
 			Mesh3D::CreateMesh(
 				"resources/birb.obj",
 				pBirbTexture,
 				context, 
-				m_CommandPool, 
-				MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.25f)) },
-				100000
+				m_CommandPool
 			)));
+
+		InstancedMeshData instancedData{};
+		instancedData.maxOffset = { 50, 50, 50 };
+		pBirb->SetInstancedMeshData(instancedData);
+		pBirb->SetVertexConstant(MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.25f)) });
+		pBirb->SetInstanceCount(100000);
 		
-		m_GraphicsPipelineInstancing.AddMesh(std::move(
+		auto pBlock = m_GraphicsPipelineInstancing.AddMesh(std::move(
 			Mesh3D::CreateMesh(
 				"resources/cube.obj",
 				pGrassTexture,
 				context,
-				m_CommandPool,
-				MeshData{ glm::translate((glm::rotate(glm::mat4(1), glm::radians(90.f), {0,1,0})),{20,0,0}) },
-				100000
+				m_CommandPool
 			)));
 
-		m_GraphicsPipeline2D.Initialize(context);
-		m_GraphicsPipeline3D.Initialize(context);
-		m_GraphicsPipelineInstancing.Initialize(context);
+		instancedData = {};
+		instancedData.maxOffset = { 10, 10, 10 };
+		pBlock->SetInstancedMeshData(instancedData);
+		pBlock->SetVertexConstant(MeshData{ glm::translate(glm::rotate(glm::mat4(1), glm::radians(90.f), { 0,1,0 }), { 20,0,0 }) });
+		pBlock->SetInstanceCount(100000);
+
+		m_GraphicsPipeline2D.Initialize(context, m_CommandPool);
+		m_GraphicsPipeline3D.Initialize(context, m_CommandPool);
+		m_GraphicsPipelineInstancing.Initialize(context, m_CommandPool);
 
 		m_CommandBuffer = m_CommandPool.CreateCommandBuffer();
 		

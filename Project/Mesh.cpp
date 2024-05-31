@@ -8,14 +8,14 @@ void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& de
 {
 	CreateVertexBuffer(physicalDevice, device, commandPool, graphicsQueue);
 	CreateIndexBuffer(physicalDevice, device, commandPool, graphicsQueue);
-	InstancedMeshData data = m_InstancedMeshData;
 	glm::mat4 transform;
+	const int amountOfMeshesPerSide = static_cast<int>(sqrtf(m_InstanceCount));
 	for (int i{}; i < m_InstanceCount; ++i)
 	{
-		int x = i % 100;
-		int y = i / 100;
+		int x = i % amountOfMeshesPerSide;
+		int y = i / amountOfMeshesPerSide;
 		InstanceVertex instance{};
-		transform = glm::translate(GetVertexConstant().model, glm::vec3{ 10.f * x, 0, 10.f * y });
+		transform = glm::translate(GetVertexConstant().model, (m_InstancedMeshData.maxOffset - m_InstancedMeshData.minOffset) * glm::vec3(x,0,y) / 2.f);
 		m_InstancedMeshData.RandomizeTranslation(transform);
 		m_InstancedMeshData.RandomizeRotation(transform);
 		m_InstancedMeshData.RandomizeScale(transform);
@@ -152,7 +152,7 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 
 	 rect->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
 
-	 rect->Initialize(context, commandPool);
+	 //rect->Initialize(context, commandPool);
 	 return rect;
  }
 
@@ -185,7 +185,7 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 
 	 oval->SetIndices(vIndices);
 
-	 oval->Initialize(context, commandPool);
+	 //oval->Initialize(context, commandPool);
 	 return oval;
  }
 
@@ -219,7 +219,7 @@ void Mesh3D::AddVertex(Vertex3D vertex)
 	m_vVertices.push_back(vertex);
 }
 
-std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool, const MeshData& vertexConstant, uint32_t instanceCount)
+std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::shared_ptr<Texture> pTexture, const VulkanContext& context, const CommandPool& commandPool)
 {
 	auto mesh = std::make_unique<Mesh3D>();
 	std::vector<Vertex3D> vertices{};
@@ -229,10 +229,7 @@ std::unique_ptr<Mesh3D> Mesh3D::CreateMesh(const std::string& fileName, std::sha
 		mesh->AddVertex(vertex);
 	
 	mesh->SetIndices(indices);
-	mesh->SetInstanceCount(instanceCount);
-	mesh->SetVertexConstant(vertexConstant);
 	mesh->SetTexture(pTexture);
-	mesh->Initialize(context.physicalDevice, context.device, commandPool, context.graphicsQueue);
 	
 	return mesh;
 }
