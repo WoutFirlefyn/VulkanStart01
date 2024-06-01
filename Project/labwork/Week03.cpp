@@ -1,6 +1,4 @@
 #include "vulkanbase/VulkanBase.h"
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <stb_image.h>
 
 void VulkanBase::createFrameBuffers() {
 	swapChainFramebuffers.resize(swapChainImageViews.size());

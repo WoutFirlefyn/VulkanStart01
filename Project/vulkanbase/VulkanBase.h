@@ -118,7 +118,7 @@ private:
 		InstancedMeshData instancedData{};
 		instancedData.maxOffset = { 50, 50, 50 };
 		pBirb->SetInstancedMeshData(instancedData);
-		pBirb->SetVertexConstant(MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.25f)) });
+		pBirb->SetVertexConstant(MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.5f)) });
 		pBirb->SetInstanceCount(100000);
 		
 		auto pBlock = m_GraphicsPipelineInstancing.AddMesh(std::move(
@@ -132,7 +132,7 @@ private:
 		instancedData = {};
 		instancedData.maxOffset = { 10, 10, 10 };
 		pBlock->SetInstancedMeshData(instancedData);
-		pBlock->SetVertexConstant(MeshData{ glm::translate(glm::rotate(glm::mat4(1), glm::radians(90.f), { 0,1,0 }), { 20,0,0 }) });
+		pBlock->SetVertexConstant(MeshData{ glm::rotate(glm::mat4(1), glm::radians(90.f), { 0,1,0 }) });
 		pBlock->SetInstanceCount(100000);
 
 		m_GraphicsPipeline2D.Initialize(context, m_CommandPool);

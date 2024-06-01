@@ -15,12 +15,12 @@ void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& de
 		int x = i % amountOfMeshesPerSide;
 		int y = i / amountOfMeshesPerSide;
 		InstanceVertex instance{};
-		transform = glm::translate(GetVertexConstant().model, (m_InstancedMeshData.maxOffset - m_InstancedMeshData.minOffset) * glm::vec3(x,0,y) / 2.f);
+		transform = glm::translate(glm::mat4(1), (m_InstancedMeshData.maxOffset - m_InstancedMeshData.minOffset) * glm::vec3(x, 0, y) / 2.f);
 		m_InstancedMeshData.RandomizeTranslation(transform);
 		m_InstancedMeshData.RandomizeRotation(transform);
 		m_InstancedMeshData.RandomizeScale(transform);
 
-		instance.modelTransform = transform;
+		instance.modelTransform = GetVertexConstant().model * transform;
 		m_vInstanceData.push_back(instance);
 	}
 	CreateInstancedVertexBuffer(physicalDevice, device, commandPool, graphicsQueue);
@@ -151,8 +151,6 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 		 rect->AddVertex(vertex);
 
 	 rect->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
-
-	 //rect->Initialize(context, commandPool);
 	 return rect;
  }
 

@@ -30,8 +30,8 @@ layout(location = 1) out vec3 fragColor;
 layout(location = 2) out vec2 fragTexCoord;
 
 void main() {
-    gl_Position = vp.proj * vp.view * model * vec4(inPosition,1);
-    vec4 tNormal = model * vec4(inNormal,0);
+    gl_Position = vp.proj * vp.view * model * mesh.model * vec4(inPosition,1);
+    vec4 tNormal = model * mesh.model * vec4(inNormal,0);
     fragNormal = normalize(tNormal.xyz);
     fragColor = inColor;
     fragTexCoord = inTexCoord;
