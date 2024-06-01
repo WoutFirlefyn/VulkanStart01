@@ -76,7 +76,7 @@ inline void GraphicsPipeline<Mesh>::Initialize(const VulkanContext& context, con
 
 	m_RenderPass = context.renderPass;
 	m_Shader.initialize(context);
-	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, m_vMeshes.size(), std::is_same_v<Mesh, Mesh3D>);
+	m_UBOPool = std::make_unique<DescriptorPool<ViewProjection>>(context.device, m_vMeshes.size());
 	m_UBOPool->Initialize<Mesh>(context, m_vMeshes);
 	CreateGraphicsPipeline(context);
 }
@@ -258,9 +258,8 @@ inline void GraphicsPipeline<Mesh>::CreateGraphicsPipeline(const VulkanContext& 
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-	if (vkCreateGraphicsPipelines(context.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(context.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline) != VK_SUCCESS)
 		throw std::runtime_error("failed to create graphics pipeline!");
-	}
 
 	m_Shader.destroyShaderModules(context.device);
 }

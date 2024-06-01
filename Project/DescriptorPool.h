@@ -10,7 +10,7 @@ template<class UBO>
 class DescriptorPool
 {
 public:
-	DescriptorPool(VkDevice device, size_t count, bool shouldUseTextures);
+	DescriptorPool(VkDevice device, size_t count);
 	~DescriptorPool();
 
 	template<typename Mesh>
@@ -33,27 +33,21 @@ private:
 	std::vector<UniformBufferObjectPtr<UBO>> m_vUBOs;
 
 	size_t m_Count;
-	bool m_TexturesEnabled;
 };
 
 template<class UBO>
-inline DescriptorPool<UBO>::DescriptorPool(VkDevice device, size_t count, bool shouldUseTextures)
+inline DescriptorPool<UBO>::DescriptorPool(VkDevice device, size_t count)
 	: m_Device{ device }
 	, m_Size{ sizeof(UBO) }
 	, m_Count(count)
 	, m_DescriptorPool{ nullptr }
 	, m_DescriptorSetLayout{ nullptr }
-	, m_TexturesEnabled{ shouldUseTextures }
 {
-	std::vector<VkDescriptorPoolSize> poolSizes(1);
+	std::vector<VkDescriptorPoolSize> poolSizes(2);
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	poolSizes[0].descriptorCount = static_cast<uint32_t>(count);
-	if(m_TexturesEnabled)
-	{
-		poolSizes.resize(2);
-		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		poolSizes[1].descriptorCount = static_cast<uint32_t>(count);
-	}
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(count);
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -61,18 +55,15 @@ inline DescriptorPool<UBO>::DescriptorPool(VkDevice device, size_t count, bool s
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(count);
 
-	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS) {
+	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &m_DescriptorPool) != VK_SUCCESS)
 		throw std::runtime_error("failed to create descriptor pool!");
-	}
 }
 
 template <class UBO>
 DescriptorPool<UBO>::~DescriptorPool()
 {
 	for (UniformBufferObjectPtr<UBO>& buffer : m_vUBOs)
-	{
 		buffer.reset();
-	}
 	vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
 	vkDestroyDescriptorPool(m_Device, m_DescriptorPool, nullptr);
 }
@@ -108,7 +99,7 @@ void DescriptorPool<UBO>::CreateDescriptorSets(std::vector<std::unique_ptr<Mesh>
 		bufferInfo.offset = 0;
 		bufferInfo.range = m_Size;
 
-		std::vector<VkWriteDescriptorSet> descriptorWrites(1);
+		std::vector<VkWriteDescriptorSet> descriptorWrites(2);
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = m_vDescriptorSets[i];
 		descriptorWrites[0].dstBinding = 0;
@@ -116,25 +107,20 @@ void DescriptorPool<UBO>::CreateDescriptorSets(std::vector<std::unique_ptr<Mesh>
 		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		descriptorWrites[0].descriptorCount = 1;
 		descriptorWrites[0].pBufferInfo = &bufferInfo;
+		auto pTexture = vMeshes[i]->GetTexture();
 
-		if (m_TexturesEnabled)
-		{
-			auto pTexture = vMeshes[i]->GetTexture();
+		VkDescriptorImageInfo imageInfo = {};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = pTexture->GetTextureImageView();
+		imageInfo.sampler = pTexture->GetTextureSampler();
 
-			VkDescriptorImageInfo imageInfo = {};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.imageView = pTexture->GetTextureImageView();
-			imageInfo.sampler = pTexture->GetTextureSampler();
-
-			descriptorWrites.resize(2);
-			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[1].dstSet = m_vDescriptorSets[i];
-			descriptorWrites[1].dstBinding = 1;
-			descriptorWrites[1].dstArrayElement = 0;
-			descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[1].descriptorCount = 1;
-			descriptorWrites[1].pImageInfo = &imageInfo;
-		}
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = m_vDescriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].dstArrayElement = 0;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pImageInfo = &imageInfo;
 
 		vkUpdateDescriptorSets(m_Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
@@ -149,22 +135,18 @@ void DescriptorPool<UBO>::BindDescriptorSet(VkCommandBuffer commandBuffer, VkPip
 template<class UBO>
 inline void DescriptorPool<UBO>::CreateDescriptorSetLayout(const VulkanContext& context)
 {
-	std::vector<VkDescriptorSetLayoutBinding> bindings(1);
+	std::vector<VkDescriptorSetLayoutBinding> bindings(2);
 	bindings[0].binding = 0;
 	bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	bindings[0].descriptorCount = 1;
 	bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 	bindings[0].pImmutableSamplers = nullptr; // Optional
 
-	if (m_TexturesEnabled)
-	{
-		bindings.resize(2);
-		bindings[1].binding = 1;
-		bindings[1].descriptorCount = 1;
-		bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		bindings[1].pImmutableSamplers = nullptr;
-		bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	}
+	bindings[1].binding = 1;
+	bindings[1].descriptorCount = 1;
+	bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	bindings[1].pImmutableSamplers = nullptr;
+	bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;

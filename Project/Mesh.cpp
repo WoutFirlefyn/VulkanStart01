@@ -114,15 +114,6 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 
 	 commandBuffer.FreeBuffer(device, commandPool);
  }
-
- void Mesh::SetInstanceData(uint32_t instanceId, const glm::vec3& t, const glm::vec2& tc)
- {
-	if (instanceId < m_InstanceCount)
-	{
-		m_vInstanceData[instanceId].modelTransform = glm::translate(glm::mat4(1.0f), t);
-		m_vInstanceData[instanceId].texCoord = tc;
-	}
- }
  //////////////////////////////////////////////
 
 
@@ -136,32 +127,33 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 m_vVertices.push_back(vertex);
  }
 
- std::unique_ptr<Mesh2D> Mesh2D::CreateRectangle(const VulkanContext& context, const CommandPool& commandPool, int top, int left, int bottom, int right)
+ std::unique_ptr<Mesh2D> Mesh2D::CreateRectangle(const VulkanContext& context, const CommandPool& commandPool, std::shared_ptr<Texture> pTexture, int top, int left, int bottom, int right)
  {
 	 auto rect = std::make_unique<Mesh2D>();
 	 const std::vector<Vertex2D> vertices = 
 	 {
-		 {glm::vec2{left, top} ,glm::vec3{1.0f,0.0f,0.0f}},
-		 {glm::vec2{right, top}	,glm::vec3{0.0f,1.0f,0.0f}},
-		 {glm::vec2{right, bottom}	,glm::vec3{1.0f,0.0f,0.0f}},
-		 {glm::vec2{left, bottom}	,glm::vec3{0.0f,0.0f,1.0f}}
+		 {glm::vec2{left, top},		glm::vec3{1.0f,0.0f,0.0f}, glm::vec2{ 0, 0}},
+		 {glm::vec2{right, top},	glm::vec3{0.0f,1.0f,0.0f}, glm::vec2{ 1, 0}},
+		 {glm::vec2{right, bottom},	glm::vec3{1.0f,0.0f,0.0f}, glm::vec2{ 1, 1}},
+		 {glm::vec2{left, bottom},	glm::vec3{0.0f,0.0f,1.0f}, glm::vec2{ 0, 1}}
 	 };
 
 	 for (const auto& vertex : vertices)
 		 rect->AddVertex(vertex);
 
 	 rect->SetIndices(std::vector<uint32_t>{0, 1, 2, 0, 2, 3});
+	 rect->SetTexture(pTexture);
 	 return rect;
  }
 
- std::unique_ptr<Mesh2D> Mesh2D::CreateOval(const VulkanContext& context, const CommandPool& commandPool, glm::vec2 center, glm::vec2 radius, int numberOfSegments)
+ std::unique_ptr<Mesh2D> Mesh2D::CreateOval(const VulkanContext& context, const CommandPool& commandPool, std::shared_ptr<Texture> pTexture, glm::vec2 center, glm::vec2 radius, int numberOfSegments)
  {
 	 const float pi = static_cast<float>(std::numbers::pi);
 	 const float radians = pi * 2 / numberOfSegments;
 
 	 auto oval = std::make_unique<Mesh2D>();
 
-	 Vertex2D centerVertex{ center, glm::vec3{1.0f,0.0f,0.0f} };
+	 Vertex2D centerVertex{ center, glm::vec3{1.0f,0.0f,0.0f}, glm::vec2{0.5f,0.5f} };
 	 Vertex2D currEdgeVertex{ {}, glm::vec3{0.0f,0.0f,1.0f} };
 
 	 std::vector<uint32_t> vIndices{};
@@ -170,6 +162,7 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 for (int i{}; i < numberOfSegments; i++)
 	 {
 		 currEdgeVertex.pos = center + radius * glm::vec2(glm::cos(radians * i), glm::sin(radians * i));
+		 currEdgeVertex.texCoord = centerVertex.texCoord + glm::vec2{ 0.5f * glm::cos(radians * i),0.5f * glm::sin(radians * i) };
 
 		 oval->AddVertex(currEdgeVertex);
 
@@ -182,14 +175,13 @@ void Mesh::CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, c
 	 }
 
 	 oval->SetIndices(vIndices);
+	 oval->SetTexture(pTexture);
 
-	 //oval->Initialize(context, commandPool);
 	 return oval;
  }
 
  void Mesh2D::CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue)
 {
-	//m_vInstanceData.resize(m_vVertices.size());
 	VkDeviceSize bufferSize = sizeof(decltype(m_vVertices)::value_type) * m_vVertices.size();
 
 	Buffer stagingBuffer{ physicalDevice, device, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,bufferSize };

@@ -84,17 +84,16 @@ private:
 		createDepthResources();
 		createFrameBuffers();
 		
-		m_Camera.Initialize(60.f, glm::vec3(0, 2, -15), static_cast<float>(swapChainExtent.width) / swapChainExtent.height);
+		m_Camera.Initialize(60.f, glm::vec3(0, 2, -30), static_cast<float>(swapChainExtent.width) / swapChainExtent.height);
 
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 
-		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, 50, 50, 100, 100)));
-		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, {75, 150}, {25, 37.5f}, 64)));
-
-		//glm::vec3 offset{ 12, 0, 0 };
+		auto pVehicleTexture = std::make_shared<Texture>("vehicle_diffuse.png", context, m_CommandPool);
+		auto pStatueTexture = std::make_shared<Texture>("statue.jpg", context, m_CommandPool);
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, pVehicleTexture, 10, 10, 150, 150)));
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, pStatueTexture, {80, 220}, {50, 60}, 64)));
 
 		auto pBirbTexture = std::make_shared<Texture>("birb.png", context, m_CommandPool);
-		auto pVehicleTexture = std::make_shared<Texture>("vehicle_diffuse.png", context, m_CommandPool);
 		auto pGrassTexture = std::make_shared<Texture>("GrassBlock.png", context, m_CommandPool);
 
 		auto pVehicle = m_GraphicsPipeline3D.AddMesh(std::move(

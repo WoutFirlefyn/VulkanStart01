@@ -74,7 +74,6 @@ public:
 	Texture* GetTexture() const { return m_pTexture ? m_pTexture.get() : nullptr; }
 
 	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue); 
-	void SetInstanceData(uint32_t instanceId, const glm::vec3& t, const glm::vec2& tc);
 protected:
 	Mesh() = default;
 	std::unique_ptr<Buffer> m_VertexBuffer;
@@ -105,8 +104,8 @@ public:
 	void AddVertex(const Vertex2D& vertex);
 	std::vector<Vertex2D> GetVertices() const { return m_vVertices; }
 
-	static std::unique_ptr<Mesh2D> CreateRectangle(const VulkanContext& context, const CommandPool& commandPool, int top, int left, int bottom, int right);
-	static std::unique_ptr<Mesh2D> CreateOval(const VulkanContext& context, const CommandPool& commandPool, glm::vec2 center, glm::vec2 radius, int numberOfSegments);
+	static std::unique_ptr<Mesh2D> CreateRectangle(const VulkanContext& context, const CommandPool& commandPool, std::shared_ptr<Texture> pTexture, int top, int left, int bottom, int right);
+	static std::unique_ptr<Mesh2D> CreateOval(const VulkanContext& context, const CommandPool& commandPool, std::shared_ptr<Texture> pTexture, glm::vec2 center, glm::vec2 radius, int numberOfSegments);
 private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) override;
 
