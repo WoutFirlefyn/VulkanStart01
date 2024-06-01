@@ -1,15 +1,11 @@
 #include "vulkanbase/VulkanBase.h"
-void VulkanBase::initWindow() {
+void VulkanBase::initWindow() 
+{
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 	glfwSetWindowUserPointer(window, this);
-	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-		void* pUser = glfwGetWindowUserPointer(window);
-		VulkanBase* vBase = static_cast<VulkanBase*>(pUser);
-		vBase->m_Camera.KeyEvent(key, scancode, action, mods);
-		});
 	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
 		void* pUser = glfwGetWindowUserPointer(window);
 		VulkanBase* vBase = static_cast<VulkanBase*>(pUser);

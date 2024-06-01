@@ -74,6 +74,8 @@ public:
 	Texture* GetTexture() const { return m_pTexture ? m_pTexture.get() : nullptr; }
 
 	void CopyBuffer(const VkDevice& device, const CommandPool& commandPool, const Buffer& stagingBuffer, const Buffer& dstBuffer, VkDeviceSize size, VkQueue graphicsQueue); 
+	void ToggleRotation(bool enabled) { m_RotationEnabled = enabled; }
+	bool RotationEnabled() const { return m_RotationEnabled; }
 protected:
 	Mesh() = default;
 	std::unique_ptr<Buffer> m_VertexBuffer;
@@ -91,6 +93,8 @@ private:
 	virtual void CreateVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue) = 0;
 	void CreateInstancedVertexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
 	void CreateIndexBuffer(VkPhysicalDevice physicalDevice, VkDevice device, const CommandPool& commandPool, VkQueue graphicsQueue);
+
+	bool m_RotationEnabled{ false };
 };
 
 class Mesh2D : public Mesh

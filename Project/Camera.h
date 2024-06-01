@@ -37,6 +37,8 @@ struct Camera
 
     glm::vec2 dragStart{};
 
+    float speed{ 100 };
+
     void Initialize(float _fovAngle = 90.f, glm::vec3 _origin = glm::vec3(0.f), float _aspectRatio = 1.f)
     {
         fovAngle = _fovAngle;
@@ -68,23 +70,23 @@ struct Camera
         CalculateProjectionMatrix();
     }
 
-    void KeyEvent(int key, int scancode, int action, int mods)
+    void KeyEvent(GLFWwindow* window, float deltaTime)
     {
-        if (key == GLFW_KEY_W && (action == GLFW_REPEAT || action == GLFW_PRESS))
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            origin += forward * 10.f;
+            origin += forward * speed * deltaTime;
         }
-        if (key == GLFW_KEY_S && (action == GLFW_REPEAT || action == GLFW_PRESS))
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            origin -= forward * 10.f;
+            origin -= forward * speed * deltaTime;
         }
-        if (key == GLFW_KEY_A && (action == GLFW_REPEAT || action == GLFW_PRESS))
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            origin += right * 10.f;
+            origin += right * speed * deltaTime;
         }
-        if (key == GLFW_KEY_D && (action == GLFW_REPEAT || action == GLFW_PRESS))
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            origin -= right * 10.f;
+            origin -= right * speed * deltaTime;
         }
     }
 

@@ -161,7 +161,8 @@ template<typename Mesh>
 inline void GraphicsPipeline<Mesh>::SetVertexConstant(const MeshData& vertexConstant)
 {
 	for (auto& mesh : m_vMeshes)
-		mesh->SetVertexConstant({ mesh->GetVertexConstant().model * vertexConstant.model });
+		if (mesh->RotationEnabled())
+			mesh->SetVertexConstant({ mesh->GetVertexConstant().model * vertexConstant.model });
 }
 
 template<typename Mesh>
