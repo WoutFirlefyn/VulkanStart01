@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project Name
-project(VulkanLab01)
+project(MinecraftClone)
 
 # Use C++17
 set(CMAKE_CXX_STANDARD 20)
@@ -37,7 +37,7 @@ find_package(Vulkan REQUIRED)
 # Include Directories
 include_directories(${Vulkan_INCLUDE_DIRS})
 
-add_subdirectory(Project)
+add_subdirectory(Renderer)
 # If using validation layers, copy the required JSON files (optional)
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 #    COMMAND ${CMAKE_COMMAND} -E copy_if_different
