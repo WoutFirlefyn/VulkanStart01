@@ -88,52 +88,52 @@ private:
 
 		VulkanContext context{ device, physicalDevice, renderPass, swapChainExtent, graphicsQueue };
 
-		//auto pStatueTexture = std::make_shared<Texture>("statue.jpg", context, m_CommandPool);
-		//auto pPenguinTexture = std::make_shared<Texture>("Skipper.png", context, m_CommandPool);
-		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, pStatueTexture, 10, 10, 150, 150)));
-		//m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, pPenguinTexture, {80, 220}, {50, 60}, 64)));
+		auto pStatueTexture = std::make_shared<Texture>("statue.jpg", context, m_CommandPool);
+		auto pPenguinTexture = std::make_shared<Texture>("Skipper.png", context, m_CommandPool);
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateRectangle(context, m_CommandPool, pStatueTexture, 10, 10, 150, 150)));
+		m_GraphicsPipeline2D.AddMesh(std::move(Mesh2D::CreateOval(context, m_CommandPool, pPenguinTexture, {80, 220}, {50, 60}, 64)));
 
-		//auto pVehicleTexture = std::make_shared<Texture>("vehicle_diffuse.png", context, m_CommandPool);
-		//auto pBirbTexture = std::make_shared<Texture>("birb.png", context, m_CommandPool);
-		//auto pBoatTexture = std::make_shared<Texture>("BoatTexture.jpg", context, m_CommandPool);
+		auto pVehicleTexture = std::make_shared<Texture>("vehicle_diffuse.png", context, m_CommandPool);
+		auto pBirbTexture = std::make_shared<Texture>("birb.png", context, m_CommandPool);
+		auto pGrassTexture = std::make_shared<Texture>("GrassBlock.png", context, m_CommandPool);
+		auto pBoatTexture = std::make_shared<Texture>("BoatTexture.jpg", context, m_CommandPool);
 
-		//auto pVehicle = m_GraphicsPipeline3D.AddMesh(std::move(
-		//	Mesh3D::CreateMesh(
-		//		"resources/vehicle.obj",
-		//		pVehicleTexture,
-		//		context, 
-		//		m_CommandPool
-		//	)));
+		auto pVehicle = m_GraphicsPipeline3D.AddMesh(std::move(
+			Mesh3D::CreateMesh(
+				"resources/vehicle.obj",
+				pVehicleTexture,
+				context, 
+				m_CommandPool
+			)));
 
-		//pVehicle->SetVertexConstant(MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{40, 20 ,-40}), glm::vec3(2)) });
-		//pVehicle->ToggleRotation(true);
+		pVehicle->SetVertexConstant(MeshData{ glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3{40, 20 ,-40}), glm::vec3(2)) });
+		pVehicle->ToggleRotation(true);
 
-		//auto pBoat = m_GraphicsPipeline3D.AddMesh(std::move(
-		//	Mesh3D::CreateMesh(
-		//		"resources/boat.obj",
-		//		pBoatTexture,
-		//		context, 
-		//		m_CommandPool
-		//	)));
+		auto pBoat = m_GraphicsPipeline3D.AddMesh(std::move(
+			Mesh3D::CreateMesh(
+				"resources/boat.obj",
+				pBoatTexture,
+				context, 
+				m_CommandPool
+			)));
 
-		//pBoat->SetVertexConstant(MeshData{ glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3{-160, 0 ,-50}), glm::radians(-70.f), {0,1,0}), glm::vec3(0.5f))});
-		//
-		//auto pBirb = m_GraphicsPipelineInstancing.AddMesh(std::move(
-		//	Mesh3D::CreateMesh(
-		//		"resources/birb.obj",
-		//		pBirbTexture,
-		//		context, 
-		//		m_CommandPool
-		//	)));
+		pBoat->SetVertexConstant(MeshData{ glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3{-160, 0 ,-50}), glm::radians(-70.f), {0,1,0}), glm::vec3(0.5f))});
+		
+		auto pBirb = m_GraphicsPipelineInstancing.AddMesh(std::move(
+			Mesh3D::CreateMesh(
+				"resources/birb.obj",
+				pBirbTexture,
+				context, 
+				m_CommandPool
+			)));
 
 		InstancedMeshData instancedData{};
-		//instancedData.maxOffset = { 50, 50, 50 };
-		//pBirb->SetInstancedMeshData(instancedData);
-		//pBirb->SetVertexConstant(MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.5f)) });
-		//pBirb->SetInstanceCount(100000);
-		//pBirb->ToggleRotation(true);
+		instancedData.maxOffset = { 50, 50, 50 };
+		pBirb->SetInstancedMeshData(instancedData);
+		pBirb->SetVertexConstant(MeshData{ glm::scale(glm::mat4(1), glm::vec3(0.5f)) });
+		pBirb->SetInstanceCount(100000);
+		pBirb->ToggleRotation(true);
 		
-		auto pGrassTexture = std::make_shared<Texture>("GrassBlock.png", context, m_CommandPool);
 		auto pBlock = m_GraphicsPipelineInstancing.AddMesh(std::move(
 			Mesh3D::CreateMesh(
 				"resources/cube.obj",
@@ -145,6 +145,7 @@ private:
 		instancedData = {};
 		instancedData.maxOffset = { 10, 10, 10 };
 		pBlock->SetInstancedMeshData(instancedData);
+		pBlock->SetVertexConstant(MeshData{ glm::rotate(glm::mat4(1), glm::radians(-90.f), { 0,1,0 }) });
 		pBlock->SetInstanceCount(100000);
 
 		m_GraphicsPipeline2D.Initialize(context, m_CommandPool);
@@ -183,8 +184,8 @@ private:
 		for (auto framebuffer : swapChainFramebuffers)
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
 
-		//m_GraphicsPipeline2D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
-		//m_GraphicsPipeline3D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
+		m_GraphicsPipeline2D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
+		m_GraphicsPipeline3D.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
 		m_GraphicsPipelineInstancing.Cleanup({ device, physicalDevice, renderPass, swapChainExtent });
 
 		vkDestroyRenderPass(device, renderPass, nullptr);

@@ -9,16 +9,16 @@ void Mesh::Initialize(const VkPhysicalDevice& physicalDevice, const VkDevice& de
 	CreateVertexBuffer(physicalDevice, device, commandPool, graphicsQueue);
 	CreateIndexBuffer(physicalDevice, device, commandPool, graphicsQueue);
 	glm::mat4 transform;
-	const int amountOfMeshesPerSide = static_cast<int>(sqrtf(static_cast<float>(m_InstanceCount)));
-	for (int i{}; i < static_cast<int>(m_InstanceCount); ++i)
+	const int amountOfMeshesPerSide = static_cast<int>(sqrtf(m_InstanceCount));
+	for (int i{}; i < m_InstanceCount; ++i)
 	{
 		int x = i % amountOfMeshesPerSide;
 		int y = i / amountOfMeshesPerSide;
 		InstanceVertex instance{};
-		transform = glm::translate(glm::mat4(1), glm::vec3(x, 0, y) * 2.f);
-		//m_InstancedMeshData.RandomizeTranslation(transform);
-		//m_InstancedMeshData.RandomizeRotation(transform);
-		//m_InstancedMeshData.RandomizeScale(transform);
+		transform = glm::translate(glm::mat4(1), (m_InstancedMeshData.maxOffset - m_InstancedMeshData.minOffset) * glm::vec3(x, 0, y) / 2.f);
+		m_InstancedMeshData.RandomizeTranslation(transform);
+		m_InstancedMeshData.RandomizeRotation(transform);
+		m_InstancedMeshData.RandomizeScale(transform);
 
 		instance.modelTransform = GetVertexConstant().model * transform;
 		m_vInstanceData.push_back(instance);
